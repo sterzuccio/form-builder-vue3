@@ -1,0 +1,52 @@
+{
+  "name": "form-builder-vue3",
+  "version": "0.1.0",
+  "private": false,
+  "description": "A Vue 3 form builder component library with drag and drop functionality",
+  "keywords": ["vue", "vue3", "form", "form-builder", "drag-and-drop", "component"],
+  "author": "Sterzuccio",
+  "license": "MIT",
+  "main": "dist/form-builder-vue3.umd.js",
+  "module": "dist/form-builder-vue3.es.js",
+  "unpkg": "dist/form-builder-vue3.umd.min.js",
+  "files": [
+    "dist",
+    "src/components",
+    "src/lib"
+  ],
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build:lib": "vue-cli-service build --target lib --name form-builder-vue3 src/lib/index.js",
+    "lint": "vue-cli-service lint",
+    "test": "vue-cli-service test:unit"
+  },
+  "dependencies": {
+    "core-js": "^3.8.3",
+    "vue": "^3.2.13",
+    "vue-router": "^4.0.3",
+    "vuex": "^4.0.0",
+    "axios": "^0.27.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-unit-jest": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/test-utils": "^2.0.0",
+    "autoprefixer": "^10.4.7",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.6"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.13"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
