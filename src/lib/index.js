@@ -10,22 +10,29 @@ const FormBuilderPlugin = {
     // Register components
     app.component('FormBuilder', FormBuilder)
     app.component('FormPreview', FormPreview)
-    
+
     // Setup store if Vuex is available and not disabled
-    if (!options.disableStore && app.config.globalProperties.$store) {
-      // Register the form builder module in the existing store
-      app.config.globalProperties.$store.registerModule(
-        options.storeModuleName || 'formBuilder', 
-        formBuilderStore
-      )
-    } else if (!options.disableStore) {
-      // Create a new store instance
-      const store = createStore({
-        modules: {
-          formBuilder: formBuilderStore
+    if (!options.disableStore) {
+      try {
+        if (app.config.globalProperties.$store) {
+          // Register the form builder module in the existing store
+          app.config.globalProperties.$store.registerModule(
+            options.storeModuleName || 'formBuilder', 
+            formBuilderStore
+          )
+        } else {
+          // Create a new store instance
+          const store = createStore({
+            modules: {
+              formBuilder: formBuilderStore
+            }
+          })
+          app.use(store)
         }
-      })
-      app.use(store)
+      } catch (error) {
+        console.warn('Error setting up form builder store:', error)
+        // Continue without store
+      }
     }
   }
 }

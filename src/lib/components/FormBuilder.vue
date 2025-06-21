@@ -546,15 +546,37 @@ export default {
     'form-updated'
   ],
   setup(props, { emit }) {
-    const store = useStore()
+    let store
+    try {
+      store = useStore()
+    } catch (error) {
+      console.warn('Vuex store not available:', error)
+      // Continue without store
+    }
 
     // Computed properties for store access with namespace
     const getStoreGetter = (getter) => {
-      return store.getters[`${props.storeModuleName}/${getter}`]
+      try {
+        if (store && store.getters && store.getters[`${props.storeModuleName}/${getter}`] !== undefined) {
+          return store.getters[`${props.storeModuleName}/${getter}`]
+        }
+        return null
+      } catch (error) {
+        console.warn(`Error accessing store getter ${getter}:`, error)
+        return null
+      }
     }
 
     const dispatchStoreAction = (action, payload) => {
-      return store.dispatch(`${props.storeModuleName}/${action}`, payload)
+      try {
+        if (store && store.dispatch) {
+          return store.dispatch(`${props.storeModuleName}/${action}`, payload)
+        }
+        return Promise.resolve()
+      } catch (error) {
+        console.warn(`Error dispatching store action ${action}:`, error)
+        return Promise.resolve()
+      }
     }
 
     // Form data
@@ -570,7 +592,22 @@ export default {
       if (props.components && props.components.length > 0) {
         return props.components
       }
-      return getStoreGetter('getAvailableComponents')
+      const storeComponents = getStoreGetter('getAvailableComponents')
+      if (storeComponents) {
+        return storeComponents
+      }
+      // Default components if store is not available
+      return [
+        { type: 'text', label: 'Text Input', icon: 'text-fields' },
+        { type: 'textarea', label: 'Text Area', icon: 'subject' },
+        { type: 'number', label: 'Number', icon: 'filter-9-plus' },
+        { type: 'select', label: 'Select', icon: 'arrow-drop-down-circle' },
+        { type: 'radio', label: 'Radio', icon: 'radio-button-checked' },
+        { type: 'checkbox', label: 'Checkbox', icon: 'check-box' },
+        { type: 'date', label: 'Date', icon: 'date-range' },
+        { type: 'email', label: 'Email', icon: 'email' },
+        { type: 'password', label: 'Password', icon: 'vpn-key' }
+      ]
     })
 
     // Computed class for main content based on sidebar visibility
@@ -599,15 +636,18 @@ export default {
 
     onMounted(() => {
       // Initialize headers
-      Object.keys(currentForm.value.headers).forEach(key => {
+      Object.keys(currentForm.value.headers || {}).forEach(key => {
         headerKeys.value[key] = key
       })
 
       // If initialForm has an id, load it from store
       if (props.initialForm.id) {
-        const form = getStoreGetter('getFormById')(props.initialForm.id)
-        if (form) {
-          currentForm.value = { ...form }
+        const getFormById = getStoreGetter('getFormById')
+        if (getFormById && typeof getFormById === 'function') {
+          const form = getFormById(props.initialForm.id)
+          if (form) {
+            currentForm.value = { ...form }
+          }
         }
       }
     })
