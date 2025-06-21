@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import FormBuilder from './components/FormBuilder.vue'
 import FormPreview from './components/FormPreview.vue'
 import { formBuilderStore } from './store'
+import '../assets/css/tailwind.css'
 
 // Create a plugin that installs the components and store
 const FormBuilderPlugin = {

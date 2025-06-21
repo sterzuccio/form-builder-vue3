@@ -23,7 +23,7 @@
       "require": "./dist/form-builder-vue3.umd.js",
       "default": "./dist/form-builder-vue3.es.js"
     },
-    "./style.css": "./dist/style.css"
+    "./dist/form-builder-vue3.css": "./dist/form-builder-vue3.css"
   },
   "files": [
     "dist"

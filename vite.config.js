@@ -15,8 +15,13 @@ export default defineConfig({
       output: {
         globals: {
           vue: 'Vue'
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') return 'form-builder-vue3.css';
+          return assetInfo.name;
         }
       }
-    }
+    },
+    cssCodeSplit: false
   }
 });
