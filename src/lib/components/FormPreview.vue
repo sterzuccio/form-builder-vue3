@@ -226,7 +226,7 @@
     <div v-if="showResultModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">{{ resultModalTitle }}</h3>
-        
+
         <div v-if="submissionSuccess" class="text-green-600 mb-4">
           <p>{{ successMessageText }}</p>
         </div>
@@ -234,7 +234,7 @@
           <p>{{ errorMessageText }}</p>
           <p v-if="submissionError" class="text-sm">{{ submissionError }}</p>
         </div>
-        
+
         <div class="mt-6 flex justify-end">
           <button 
             @click="closeResultModal" 
@@ -249,7 +249,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
@@ -320,7 +320,7 @@ export default {
   ],
   setup(props, { emit }) {
     const store = useStore()
-    
+
     // Computed properties for store access with namespace
     const getStoreGetter = (getter) => {
       try {
@@ -330,28 +330,28 @@ export default {
         return null
       }
     }
-    
+
     // Form data
     const formData = reactive({})
     const errors = ref({})
-    
+
     // Form submission result
     const showResultModal = ref(false)
     const submissionSuccess = ref(false)
     const submissionError = ref('')
-    
+
     // Watch for changes to form prop
     watch(() => props.form, (newForm) => {
       initializeFormData(newForm)
     })
-    
+
     // Watch for changes to formId prop
     watch(() => props.formId, (newId) => {
       if (newId) {
         loadFormById(newId)
       }
     })
-    
+
     onMounted(() => {
       // If formId is provided, try to load the form from store
       if (props.formId) {
@@ -361,7 +361,7 @@ export default {
         initializeFormData(props.form)
       }
     })
-    
+
     const loadFormById = (id) => {
       const formGetter = getStoreGetter('getFormById')
       if (formGetter) {
@@ -371,12 +371,12 @@ export default {
         }
       }
     }
-    
+
     const initializeFormData = (form) => {
       // Initialize form data with default values
       form.fields.forEach(field => {
         const fieldId = getFieldId(field)
-        
+
         switch (field.type) {
           case 'checkbox':
             if (field.options && field.options.length > 1) {
@@ -393,30 +393,30 @@ export default {
         }
       })
     }
-    
+
     const getFieldId = (field) => {
       return field.name || `${field.type}_${field.label.replace(/\s+/g, '')}`
     }
-    
+
     const validate = () => {
       const newErrors = {}
-      
+
       props.form.fields.forEach(field => {
         const fieldId = getFieldId(field)
         const value = formData[fieldId]
-        
+
         // Required validation
         if (field.required && (value === '' || value === null || value === undefined || 
             (Array.isArray(value) && value.length === 0))) {
           newErrors[fieldId] = 'This field is required'
           return
         }
-        
+
         // Skip other validations if field is empty and not required
         if (value === '' || value === null || value === undefined) {
           return
         }
-        
+
         // Validation rules
         if (field.validation) {
           // Min/Max validation for text, textarea, password
@@ -427,7 +427,7 @@ export default {
               newErrors[fieldId] = `Maximum length is ${field.validation.max}`
             }
           }
-          
+
           // Min/Max validation for number
           if (field.type === 'number' && !isNaN(value)) {
             const numValue = Number(value)
@@ -437,7 +437,7 @@ export default {
               newErrors[fieldId] = `Maximum value is ${field.validation.max}`
             }
           }
-          
+
           // Pattern validation
           if (field.validation.pattern && typeof value === 'string') {
             try {
@@ -451,24 +451,24 @@ export default {
           }
         }
       })
-      
+
       errors.value = newErrors
-      
+
       if (Object.keys(newErrors).length > 0) {
         emit('validation-error', newErrors)
       }
-      
+
       return Object.keys(newErrors).length === 0
     }
-    
+
     const submitForm = async () => {
       if (!validate()) {
         return
       }
-      
+
       // Emit submit event with form data
       emit('submit', { ...formData })
-      
+
       // If no endpoint is specified, just show success
       if (!props.form.endpoint) {
         submissionSuccess.value = true
@@ -477,7 +477,7 @@ export default {
         emit('submit-success', { data: null })
         return
       }
-      
+
       try {
         const response = await fetch(props.form.endpoint, {
           method: props.form.method || 'POST',
@@ -487,14 +487,14 @@ export default {
           },
           body: JSON.stringify(formData)
         })
-        
+
         let responseData = null
         try {
           responseData = await response.json()
         } catch (e) {
           // Response might not be JSON
         }
-        
+
         if (response.ok) {
           submissionSuccess.value = true
           submissionError.value = ''
@@ -513,14 +513,14 @@ export default {
         submissionError.value = error.message || 'Network error'
         emit('submit-error', { error })
       }
-      
+
       showResultModal.value = true
     }
-    
+
     const closeResultModal = () => {
       showResultModal.value = false
     }
-    
+
     return {
       formData,
       errors,

@@ -39,4 +39,6 @@ Thumbs.db
 /build
 
 PUBLISHING.md
+TESTING.md
+SECURITY.md
 package-lock.json

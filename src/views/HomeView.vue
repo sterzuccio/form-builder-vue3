@@ -57,13 +57,11 @@
 <script>
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
 
 export default {
   name: 'HomeView',
   setup() {
     const store = useStore()
-    const router = useRouter()
 
     onMounted(() => {
       store.dispatch('loadForms')

@@ -110,7 +110,7 @@
       <!-- Right Sidebar - Form Settings -->
       <div v-if="showFormSettings" class="md:col-span-1 bg-white shadow rounded-lg p-4">
         <h3 class="text-lg font-medium text-gray-900 mb-4">{{ formSettingsTitle }}</h3>
-        
+
         <div class="space-y-4">
           <div>
             <label for="endpoint" class="block text-sm font-medium text-gray-700">{{ endpointLabel }}</label>
@@ -122,7 +122,7 @@
               :placeholder="endpointPlaceholder"
             >
           </div>
-          
+
           <div>
             <label for="method" class="block text-sm font-medium text-gray-700">{{ methodLabel }}</label>
             <select 
@@ -133,7 +133,7 @@
               <option v-for="method in httpMethods" :key="method" :value="method">{{ method }}</option>
             </select>
           </div>
-          
+
           <div v-if="showHeaders">
             <label class="block text-sm font-medium text-gray-700 mb-2">{{ headersLabel }}</label>
             <div v-for="(value, key) in headers" :key="key" class="flex mb-2">
@@ -165,7 +165,7 @@
     <div v-if="showFieldModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">{{ editModalTitle }} {{ getComponentLabel(editingField.type) }}</h3>
-        
+
         <div class="space-y-4">
           <div>
             <label for="field-label" class="block text-sm font-medium text-gray-700">{{ fieldLabelText }}</label>
@@ -176,7 +176,7 @@
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
           </div>
-          
+
           <div>
             <label for="field-placeholder" class="block text-sm font-medium text-gray-700">{{ fieldPlaceholderText }}</label>
             <input 
@@ -186,7 +186,7 @@
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
           </div>
-          
+
           <div class="flex items-center">
             <input 
               type="checkbox" 
@@ -196,11 +196,11 @@
             >
             <label for="field-required" class="ml-2 block text-sm text-gray-900">{{ fieldRequiredText }}</label>
           </div>
-          
+
           <!-- Validation Options -->
           <div v-if="['text', 'textarea', 'number', 'email', 'password'].includes(editingField.type)">
             <h4 class="text-sm font-medium text-gray-700 mb-2">{{ validationTitle }}</h4>
-            
+
             <div v-if="['text', 'textarea', 'password'].includes(editingField.type)" class="grid grid-cols-2 gap-4">
               <div>
                 <label for="field-min" class="block text-sm font-medium text-gray-700">{{ minLengthText }}</label>
@@ -221,7 +221,7 @@
                 >
               </div>
             </div>
-            
+
             <div v-if="['number'].includes(editingField.type)" class="grid grid-cols-2 gap-4">
               <div>
                 <label for="field-min" class="block text-sm font-medium text-gray-700">{{ minValueText }}</label>
@@ -242,7 +242,7 @@
                 >
               </div>
             </div>
-            
+
             <div v-if="['text', 'email', 'password'].includes(editingField.type)">
               <label for="field-pattern" class="block text-sm font-medium text-gray-700 mt-4">{{ patternText }}</label>
               <input 
@@ -253,11 +253,11 @@
               >
             </div>
           </div>
-          
+
           <!-- Options for select, radio, checkbox -->
           <div v-if="['select', 'radio', 'checkbox'].includes(editingField.type)">
             <h4 class="text-sm font-medium text-gray-700 mb-2">{{ optionsTitle }}</h4>
-            
+
             <div v-for="(option, optionIndex) in editingField.options" :key="optionIndex" class="flex mb-2">
               <input 
                 type="text" 
@@ -278,7 +278,7 @@
                 {{ removeOptionText }}
               </button>
             </div>
-            
+
             <button 
               @click="addOption" 
               class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -287,7 +287,7 @@
             </button>
           </div>
         </div>
-        
+
         <div class="mt-6 flex justify-end space-x-3">
           <button 
             @click="closeFieldModal" 
@@ -309,11 +309,11 @@
     <div v-if="showExportModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">{{ exportModalTitle }}</h3>
-        
+
         <div class="mb-4">
           <pre class="bg-gray-100 p-4 rounded-md overflow-auto max-h-96"><code>{{ exportedCode }}</code></pre>
         </div>
-        
+
         <div class="flex justify-end">
           <button 
             @click="copyCode" 
@@ -334,7 +334,7 @@
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
@@ -547,24 +547,24 @@ export default {
   ],
   setup(props, { emit }) {
     const store = useStore()
-    
+
     // Computed properties for store access with namespace
     const getStoreGetter = (getter) => {
       return store.getters[`${props.storeModuleName}/${getter}`]
     }
-    
+
     const dispatchStoreAction = (action, payload) => {
       return store.dispatch(`${props.storeModuleName}/${action}`, payload)
     }
-    
+
     // Form data
     const currentForm = ref({ ...props.initialForm })
-    
+
     // Watch for changes to initialForm prop
     watch(() => props.initialForm, (newForm) => {
       currentForm.value = { ...newForm }
     })
-    
+
     // Available components
     const availableComponents = computed(() => {
       if (props.components && props.components.length > 0) {
@@ -572,7 +572,7 @@ export default {
       }
       return getStoreGetter('getAvailableComponents')
     })
-    
+
     // Computed class for main content based on sidebar visibility
     const mainContentClass = computed(() => {
       if (!props.showComponentSelector && !props.showFormSettings) {
@@ -583,26 +583,26 @@ export default {
         return 'md:col-span-2 bg-white shadow rounded-lg p-4'
       }
     })
-    
+
     // Headers management
     const headers = ref({...currentForm.value.headers})
     const headerKeys = ref({})
-    
+
     // Field editing
     const showFieldModal = ref(false)
     const editingField = ref({})
     const editingFieldIndex = ref(-1)
-    
+
     // Code export
     const showExportModal = ref(false)
     const exportedCode = ref('')
-    
+
     onMounted(() => {
       // Initialize headers
       Object.keys(currentForm.value.headers).forEach(key => {
         headerKeys.value[key] = key
       })
-      
+
       // If initialForm has an id, load it from store
       if (props.initialForm.id) {
         const form = getStoreGetter('getFormById')(props.initialForm.id)
@@ -611,23 +611,23 @@ export default {
         }
       }
     })
-    
+
     // Drag and drop functionality
     const onDragStart = (event, component) => {
       event.dataTransfer.setData('componentType', component.type)
     }
-    
+
     const onDrop = (event) => {
       const componentType = event.dataTransfer.getData('componentType')
       if (!componentType) return
-      
+
       // Create a new field based on the component type
       const newField = createDefaultField(componentType)
       currentForm.value.fields.push(newField)
       emit('field-added', newField)
       emit('form-updated', currentForm.value)
     }
-    
+
     const createDefaultField = (type) => {
       const field = {
         type,
@@ -636,48 +636,48 @@ export default {
         required: false,
         validation: {}
       }
-      
+
       if (['select', 'radio', 'checkbox'].includes(type)) {
         field.options = [
           { value: 'option1', label: 'Option 1' },
           { value: 'option2', label: 'Option 2' }
         ]
       }
-      
+
       return field
     }
-    
+
     const getComponentLabel = (type) => {
       const component = availableComponents.value.find(c => c.type === type)
       return component ? component.label : type
     }
-    
+
     // Field editing
     const editField = (index) => {
       editingFieldIndex.value = index
       editingField.value = JSON.parse(JSON.stringify(currentForm.value.fields[index]))
-      
+
       // Ensure validation object exists
       if (!editingField.value.validation) {
         editingField.value.validation = {}
       }
-      
+
       showFieldModal.value = true
     }
-    
+
     const saveField = () => {
       currentForm.value.fields.splice(editingFieldIndex.value, 1, editingField.value)
       emit('field-updated', { index: editingFieldIndex.value, field: editingField.value })
       emit('form-updated', currentForm.value)
       closeFieldModal()
     }
-    
+
     const closeFieldModal = () => {
       showFieldModal.value = false
       editingField.value = {}
       editingFieldIndex.value = -1
     }
-    
+
     const deleteField = (index) => {
       if (confirm('Are you sure you want to delete this field?')) {
         currentForm.value.fields.splice(index, 1)
@@ -685,7 +685,7 @@ export default {
         emit('form-updated', currentForm.value)
       }
     }
-    
+
     // Options management for select, radio, checkbox
     const addOption = () => {
       if (!editingField.value.options) {
@@ -693,18 +693,18 @@ export default {
       }
       editingField.value.options.push({ value: '', label: '' })
     }
-    
+
     const removeOption = (index) => {
       editingField.value.options.splice(index, 1)
     }
-    
+
     // Headers management
     const addHeader = () => {
       const newKey = `header${Object.keys(headers.value).length + 1}`
       headers.value[newKey] = ''
       headerKeys.value[newKey] = newKey
     }
-    
+
     // Save form
     const saveForm = () => {
       // Update headers from the UI to the form
@@ -714,128 +714,129 @@ export default {
           formattedHeaders[headerKeys.value[key]] = headers.value[key]
         }
       })
-      
+
       currentForm.value.headers = formattedHeaders
-      
+
       // Save to store if available
       try {
         dispatchStoreAction('saveForm', { form: currentForm.value })
       } catch (e) {
         console.warn('Store not available or error saving form:', e)
       }
-      
+
       // Emit save event
       emit('save', currentForm.value)
     }
-    
+
     // Export form code
     const exportFormCode = () => {
       // Generate Vue component code for the form
       const formFields = currentForm.value.fields.map(field => {
         return generateFieldCode(field)
       }).join('\n      ')
-      
+
       const validationRules = currentForm.value.fields.reduce((rules, field) => {
         if (field.required || field.validation) {
           rules[field.name || field.type + field.label.replace(/\s+/g, '')] = generateValidationRules(field)
         }
         return rules
       }, {})
-      
-      exportedCode.value = `<template>
-  <form @submit.prevent="submitForm" class="space-y-6">
-    ${formFields}
-    <div>
-      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        Submit
-      </button>
-    </div>
-  </form>
-</template>
 
-<script>
-import { reactive, ref } from 'vue'
+      // Use string concatenation to avoid Vue parsing the template tags
+      exportedCode.value = '<template>\n' +
+  '  <form @submit.prevent="submitForm" class="space-y-6">\n' +
+  '    ' + formFields + '\n' +
+  '    <div>\n' +
+  '      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">\n' +
+  '        Submit\n' +
+  '      </button>\n' +
+  '    </div>\n' +
+  '  </form>\n' +
+  '</template>\n' +
+  '\n' +
+  '<script>\n' +
+  'import { reactive, ref } from \'vue\'\n' +
+  '\n' +
+  'export default {\n' +
+  '  name: \'' + (currentForm.value.name || 'GeneratedForm') + '\',\n' +
+  '  setup() {\n' +
+  '    const formData = reactive({\n' +
+  '      ' + currentForm.value.fields.map(field => {
+          const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
+          return fieldName + ': ' + getDefaultValueForType(field.type, field)
+        }).join(',\n      ') + '\n' +
+  '    })\n' +
+  '\n' +
+  '    const errors = ref({})\n' +
+  '\n' +
+  '    const rules = ' + JSON.stringify(validationRules, null, 6).replace(/"([^"]+)":/g, '$1:') + '\n' +
+  '\n' +
+  '    const validate = () => {\n' +
+  '      const newErrors = {}\n' +
+  '\n' +
+  '      Object.keys(rules).forEach(field => {\n' +
+  '        const fieldRules = rules[field]\n' +
+  '\n' +
+  '        if (fieldRules.required && !formData[field]) {\n' +
+  '          newErrors[field] = \'This field is required\'\n' +
+  '        } else if (fieldRules.min && formData[field].length < fieldRules.min) {\n' +
+  '          newErrors[field] = `Minimum length is ${fieldRules.min}`\n' +
+  '        } else if (fieldRules.max && formData[field].length > fieldRules.max) {\n' +
+  '          newErrors[field] = `Maximum length is ${fieldRules.max}`\n' +
+  '        } else if (fieldRules.pattern && !new RegExp(fieldRules.pattern).test(formData[field])) {\n' +
+  '          newErrors[field] = \'Invalid format\'\n' +
+  '        }\n' +
+  '      })\n' +
+  '\n' +
+  '      errors.value = newErrors\n' +
+  '      return Object.keys(newErrors).length === 0\n' +
+  '    }\n' +
+  '\n' +
+  '    const submitForm = async () => {\n' +
+  '      if (!validate()) {\n' +
+  '        return\n' +
+  '      }\n' +
+  '\n' +
+  '      try {\n' +
+  '        const response = await fetch(\'' + (currentForm.value.endpoint || 'https://api.example.com/submit') + '\', {\n' +
+  '          method: \'' + (currentForm.value.method || 'POST') + '\',\n' +
+  '          headers: {\n' +
+  '            \'Content-Type\': \'application/json\',\n' +
+  '            ' + Object.entries(currentForm.value.headers || {}).map(([key, value]) => '\'' + key + '\': \'' + value + '\'').join(',\n            ') + '\n' +
+  '          },\n' +
+  '          body: JSON.stringify(formData)\n' +
+  '        })\n' +
+  '\n' +
+  '        if (response.ok) {\n' +
+  '          alert(\'Form submitted successfully!\')\n' +
+  '          // Reset form or redirect\n' +
+  '        } else {\n' +
+  '          alert(\'Error submitting form\')\n' +
+  '        }\n' +
+  '      } catch (error) {\n' +
+  '        console.error(\'Error:\', error)\n' +
+  '        alert(\'Error submitting form\')\n' +
+  '      }\n' +
+  '    }\n' +
+  '\n' +
+  '    return {\n' +
+  '      formData,\n' +
+  '      errors,\n' +
+  '      submitForm\n' +
+  '    }\n' +
+  '  }\n' +
+  '}\n' +
+  '</' + 'script>'
 
-export default {
-  name: '${currentForm.value.name || 'GeneratedForm'}',
-  setup() {
-    const formData = reactive({
-      ${currentForm.value.fields.map(field => {
-        const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
-        return `${fieldName}: ${getDefaultValueForType(field.type)}`
-      }).join(',\n      ')}
-    })
-    
-    const errors = ref({})
-    
-    const rules = ${JSON.stringify(validationRules, null, 6).replace(/"([^"]+)":/g, '$1:')}
-    
-    const validate = () => {
-      const newErrors = {}
-      
-      Object.keys(rules).forEach(field => {
-        const fieldRules = rules[field]
-        
-        if (fieldRules.required && !formData[field]) {
-          newErrors[field] = 'This field is required'
-        } else if (fieldRules.min && formData[field].length < fieldRules.min) {
-          newErrors[field] = \`Minimum length is \${fieldRules.min}\`
-        } else if (fieldRules.max && formData[field].length > fieldRules.max) {
-          newErrors[field] = \`Maximum length is \${fieldRules.max}\`
-        } else if (fieldRules.pattern && !new RegExp(fieldRules.pattern).test(formData[field])) {
-          newErrors[field] = 'Invalid format'
-        }
-      })
-      
-      errors.value = newErrors
-      return Object.keys(newErrors).length === 0
-    }
-    
-    const submitForm = async () => {
-      if (!validate()) {
-        return
-      }
-      
-      try {
-        const response = await fetch('${currentForm.value.endpoint || 'https://api.example.com/submit'}', {
-          method: '${currentForm.value.method || 'POST'}',
-          headers: {
-            'Content-Type': 'application/json',
-            ${Object.entries(currentForm.value.headers || {}).map(([key, value]) => `'${key}': '${value}'`).join(',\n            ')}
-          },
-          body: JSON.stringify(formData)
-        })
-        
-        if (response.ok) {
-          alert('Form submitted successfully!')
-          // Reset form or redirect
-        } else {
-          alert('Error submitting form')
-        }
-      } catch (error) {
-        console.error('Error:', error)
-        alert('Error submitting form')
-      }
-    }
-    
-    return {
-      formData,
-      errors,
-      submitForm
-    }
-  }
-}
-</script>`
-      
       showExportModal.value = true
       emit('export', exportedCode.value)
     }
-    
+
     const generateFieldCode = (field) => {
       const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
       const requiredAttr = field.required ? ' required' : ''
-      const errorDisplay = `<p v-if="errors.${fieldName}" class="mt-2 text-sm text-red-600">{{ errors.${fieldName} }}</p>`
-      
+      const errorDisplay = `<p v-if="errors['${fieldName}']" class="mt-2 text-sm text-red-600">{{ errors['${fieldName}'] }}</p>`
+
       switch (field.type) {
         case 'text':
         case 'email':
@@ -853,7 +854,7 @@ export default {
         >
         ${errorDisplay}
       </div>`
-        
+
         case 'textarea':
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -865,7 +866,7 @@ export default {
         ></textarea>
         ${errorDisplay}
       </div>`
-        
+
         case 'select':
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -879,7 +880,7 @@ export default {
         </select>
         ${errorDisplay}
       </div>`
-        
+
         case 'radio':
           return `<div>
         <span class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</span>
@@ -901,7 +902,7 @@ export default {
         </div>
         ${errorDisplay}
       </div>`
-        
+
         case 'checkbox':
           if (field.options && field.options.length > 1) {
             return `<div>
@@ -937,7 +938,7 @@ export default {
         ${errorDisplay}
       </div>`
           }
-        
+
         default:
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -952,51 +953,54 @@ export default {
       </div>`
       }
     }
-    
+
     const generateValidationRules = (field) => {
       const rules = {}
-      
+
       if (field.required) {
         rules.required = true
       }
-      
+
       if (field.validation) {
         if (field.validation.min !== undefined && field.validation.min !== null && field.validation.min !== '') {
           rules.min = parseInt(field.validation.min)
         }
-        
+
         if (field.validation.max !== undefined && field.validation.max !== null && field.validation.max !== '') {
           rules.max = parseInt(field.validation.max)
         }
-        
+
         if (field.validation.pattern) {
           rules.pattern = field.validation.pattern
         }
       }
-      
+
       return rules
     }
-    
-    const getDefaultValueForType = (type) => {
+
+    const getDefaultValueForType = (type, field) => {
       switch (type) {
         case 'checkbox':
-          return 'false'
+          // Check if it's a multi-checkbox (with options) or a single checkbox
+          if (field && field.options && field.options.length > 1) {
+            return '[]'
+          } else {
+            return 'false'
+          }
         case 'number':
           return '0'
         case 'select':
         case 'radio':
           return "''"
-        case 'checkbox':
-          return '[]'
         default:
           return "''"
       }
     }
-    
+
     const closeExportModal = () => {
       showExportModal.value = false
     }
-    
+
     const copyCode = () => {
       navigator.clipboard.writeText(exportedCode.value)
         .then(() => {
@@ -1006,7 +1010,7 @@ export default {
           console.error('Failed to copy code: ', err)
         })
     }
-    
+
     return {
       currentForm,
       availableComponents,

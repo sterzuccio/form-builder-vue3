@@ -106,7 +106,7 @@
       <!-- Right Sidebar - Form Settings -->
       <div class="md:col-span-1 bg-white shadow rounded-lg p-4">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Form Settings</h3>
-        
+
         <div class="space-y-4">
           <div>
             <label for="endpoint" class="block text-sm font-medium text-gray-700">Endpoint</label>
@@ -118,7 +118,7 @@
               placeholder="https://api.example.com/submit"
             >
           </div>
-          
+
           <div>
             <label for="method" class="block text-sm font-medium text-gray-700">HTTP Method</label>
             <select 
@@ -133,7 +133,7 @@
               <option value="DELETE">DELETE</option>
             </select>
           </div>
-          
+
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Headers</label>
             <div v-for="(value, key) in headers" :key="key" class="flex mb-2">
@@ -165,7 +165,7 @@
     <div v-if="showFieldModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Edit {{ getComponentLabel(editingField.type) }}</h3>
-        
+
         <div class="space-y-4">
           <div>
             <label for="field-label" class="block text-sm font-medium text-gray-700">Label</label>
@@ -176,7 +176,7 @@
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
           </div>
-          
+
           <div>
             <label for="field-placeholder" class="block text-sm font-medium text-gray-700">Placeholder</label>
             <input 
@@ -186,7 +186,7 @@
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
           </div>
-          
+
           <div class="flex items-center">
             <input 
               type="checkbox" 
@@ -196,11 +196,11 @@
             >
             <label for="field-required" class="ml-2 block text-sm text-gray-900">Required</label>
           </div>
-          
+
           <!-- Validation Options -->
           <div v-if="['text', 'textarea', 'number', 'email', 'password'].includes(editingField.type)">
             <h4 class="text-sm font-medium text-gray-700 mb-2">Validation</h4>
-            
+
             <div v-if="['text', 'textarea', 'password'].includes(editingField.type)" class="grid grid-cols-2 gap-4">
               <div>
                 <label for="field-min" class="block text-sm font-medium text-gray-700">Min Length</label>
@@ -221,7 +221,7 @@
                 >
               </div>
             </div>
-            
+
             <div v-if="['number'].includes(editingField.type)" class="grid grid-cols-2 gap-4">
               <div>
                 <label for="field-min" class="block text-sm font-medium text-gray-700">Min Value</label>
@@ -242,7 +242,7 @@
                 >
               </div>
             </div>
-            
+
             <div v-if="['text', 'email', 'password'].includes(editingField.type)">
               <label for="field-pattern" class="block text-sm font-medium text-gray-700 mt-4">Pattern (Regex)</label>
               <input 
@@ -253,11 +253,11 @@
               >
             </div>
           </div>
-          
+
           <!-- Options for select, radio, checkbox -->
           <div v-if="['select', 'radio', 'checkbox'].includes(editingField.type)">
             <h4 class="text-sm font-medium text-gray-700 mb-2">Options</h4>
-            
+
             <div v-for="(option, optionIndex) in editingField.options" :key="optionIndex" class="flex mb-2">
               <input 
                 type="text" 
@@ -278,7 +278,7 @@
                 Remove
               </button>
             </div>
-            
+
             <button 
               @click="addOption" 
               class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -287,7 +287,7 @@
             </button>
           </div>
         </div>
-        
+
         <div class="mt-6 flex justify-end space-x-3">
           <button 
             @click="closeFieldModal" 
@@ -309,11 +309,11 @@
     <div v-if="showExportModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Export Form Code</h3>
-        
+
         <div class="mb-4">
           <pre class="bg-gray-100 p-4 rounded-md overflow-auto max-h-96"><code>{{ exportedCode }}</code></pre>
         </div>
-        
+
         <div class="flex justify-end">
           <button 
             @click="copyCode" 
@@ -334,7 +334,7 @@
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -344,24 +344,24 @@ export default {
     const store = useStore()
     const router = useRouter()
     const route = useRoute()
-    
+
     // Form data
     const currentForm = computed(() => store.getters.getCurrentForm)
     const availableComponents = computed(() => store.getters.getAvailableComponents)
-    
+
     // Headers management
     const headers = ref({...currentForm.value.headers})
     const headerKeys = ref({})
-    
+
     // Field editing
     const showFieldModal = ref(false)
     const editingField = ref({})
     const editingFieldIndex = ref(-1)
-    
+
     // Code export
     const showExportModal = ref(false)
     const exportedCode = ref('')
-    
+
     onMounted(() => {
       // Check if we're editing an existing form
       const formId = route.query.id
@@ -372,27 +372,27 @@ export default {
           store.dispatch('setCurrentForm', {...form})
         }
       }
-      
+
       // Initialize headers
       Object.keys(currentForm.value.headers).forEach(key => {
         headerKeys.value[key] = key
       })
     })
-    
+
     // Drag and drop functionality
     const onDragStart = (event, component) => {
       event.dataTransfer.setData('componentType', component.type)
     }
-    
+
     const onDrop = (event) => {
       const componentType = event.dataTransfer.getData('componentType')
       if (!componentType) return
-      
+
       // Create a new field based on the component type
       const newField = createDefaultField(componentType)
       store.dispatch('addField', newField)
     }
-    
+
     const createDefaultField = (type) => {
       const field = {
         type,
@@ -401,35 +401,35 @@ export default {
         required: false,
         validation: {}
       }
-      
+
       if (['select', 'radio', 'checkbox'].includes(type)) {
         field.options = [
           { value: 'option1', label: 'Option 1' },
           { value: 'option2', label: 'Option 2' }
         ]
       }
-      
+
       return field
     }
-    
+
     const getComponentLabel = (type) => {
       const component = availableComponents.value.find(c => c.type === type)
       return component ? component.label : type
     }
-    
+
     // Field editing
     const editField = (index) => {
       editingFieldIndex.value = index
       editingField.value = JSON.parse(JSON.stringify(currentForm.value.fields[index]))
-      
+
       // Ensure validation object exists
       if (!editingField.value.validation) {
         editingField.value.validation = {}
       }
-      
+
       showFieldModal.value = true
     }
-    
+
     const saveField = () => {
       store.dispatch('updateField', {
         index: editingFieldIndex.value,
@@ -437,19 +437,19 @@ export default {
       })
       closeFieldModal()
     }
-    
+
     const closeFieldModal = () => {
       showFieldModal.value = false
       editingField.value = {}
       editingFieldIndex.value = -1
     }
-    
+
     const deleteField = (index) => {
       if (confirm('Are you sure you want to delete this field?')) {
         store.dispatch('deleteField', index)
       }
     }
-    
+
     // Options management for select, radio, checkbox
     const addOption = () => {
       if (!editingField.value.options) {
@@ -457,18 +457,18 @@ export default {
       }
       editingField.value.options.push({ value: '', label: '' })
     }
-    
+
     const removeOption = (index) => {
       editingField.value.options.splice(index, 1)
     }
-    
+
     // Headers management
     const addHeader = () => {
       const newKey = `header${Object.keys(headers.value).length + 1}`
       headers.value[newKey] = ''
       headerKeys.value[newKey] = newKey
     }
-    
+
     // Save form
     const saveForm = () => {
       // Update headers from the UI to the form
@@ -478,13 +478,13 @@ export default {
           formattedHeaders[headerKeys.value[key]] = headers.value[key]
         }
       })
-      
+
       store.dispatch('updateFormSettings', {
         endpoint: currentForm.value.endpoint,
         method: currentForm.value.method,
         headers: formattedHeaders
       })
-      
+
       store.dispatch('saveForm').then(savedForm => {
         alert('Form saved successfully!')
         // If it's a new form, update the URL to include the form ID
@@ -493,114 +493,115 @@ export default {
         }
       })
     }
-    
+
     // Export form code
     const exportFormCode = () => {
       // Generate Vue component code for the form
       const formFields = currentForm.value.fields.map(field => {
         return generateFieldCode(field)
       }).join('\n      ')
-      
+
       const validationRules = currentForm.value.fields.reduce((rules, field) => {
         if (field.required || field.validation) {
           rules[field.name || field.type + field.label.replace(/\s+/g, '')] = generateValidationRules(field)
         }
         return rules
       }, {})
-      
-      exportedCode.value = `<template>
-  <form @submit.prevent="submitForm" class="space-y-6">
-    ${formFields}
-    <div>
-      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        Submit
-      </button>
-    </div>
-  </form>
-</template>
 
-<script>
-import { reactive, ref } from 'vue'
+      // Use string concatenation to avoid Vue parsing the template tags
+      exportedCode.value = '<template>\n' +
+  '  <form @submit.prevent="submitForm" class="space-y-6">\n' +
+  '    ' + formFields + '\n' +
+  '    <div>\n' +
+  '      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">\n' +
+  '        Submit\n' +
+  '      </button>\n' +
+  '    </div>\n' +
+  '  </form>\n' +
+  '</template>\n' +
+  '\n' +
+  '<script>\n' +
+  'import { reactive, ref } from \'vue\'\n' +
+  '\n' +
+  'export default {\n' +
+  '  name: \'' + (currentForm.value.name || 'GeneratedForm') + '\',\n' +
+  '  setup() {\n' +
+  '    const formData = reactive({\n' +
+  '      ' + currentForm.value.fields.map(field => {
+          const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
+          return fieldName + ': ' + getDefaultValueForType(field.type, field)
+        }).join(',\n      ') + '\n' +
+  '    })\n' +
+  '\n' +
+  '    const errors = ref({})\n' +
+  '\n' +
+  '    const rules = ' + JSON.stringify(validationRules, null, 6).replace(/"([^"]+)":/g, '$1:') + '\n' +
+  '\n' +
+  '    const validate = () => {\n' +
+  '      const newErrors = {}\n' +
+  '\n' +
+  '      Object.keys(rules).forEach(field => {\n' +
+  '        const fieldRules = rules[field]\n' +
+  '\n' +
+  '        if (fieldRules.required && !formData[field]) {\n' +
+  '          newErrors[field] = \'This field is required\'\n' +
+  '        } else if (fieldRules.min && formData[field].length < fieldRules.min) {\n' +
+  '          newErrors[field] = `Minimum length is ${fieldRules.min}`\n' +
+  '        } else if (fieldRules.max && formData[field].length > fieldRules.max) {\n' +
+  '          newErrors[field] = `Maximum length is ${fieldRules.max}`\n' +
+  '        } else if (fieldRules.pattern && !new RegExp(fieldRules.pattern).test(formData[field])) {\n' +
+  '          newErrors[field] = \'Invalid format\'\n' +
+  '        }\n' +
+  '      })\n' +
+  '\n' +
+  '      errors.value = newErrors\n' +
+  '      return Object.keys(newErrors).length === 0\n' +
+  '    }\n' +
+  '\n' +
+  '    const submitForm = async () => {\n' +
+  '      if (!validate()) {\n' +
+  '        return\n' +
+  '      }\n' +
+  '\n' +
+  '      try {\n' +
+  '        const response = await fetch(\'' + (currentForm.value.endpoint || 'https://api.example.com/submit') + '\', {\n' +
+  '          method: \'' + (currentForm.value.method || 'POST') + '\',\n' +
+  '          headers: {\n' +
+  '            \'Content-Type\': \'application/json\',\n' +
+  '            ' + Object.entries(currentForm.value.headers || {}).map(([key, value]) => '\'' + key + '\': \'' + value + '\'').join(',\n            ') + '\n' +
+  '          },\n' +
+  '          body: JSON.stringify(formData)\n' +
+  '        })\n' +
+  '\n' +
+  '        if (response.ok) {\n' +
+  '          alert(\'Form submitted successfully!\')\n' +
+  '          // Reset form or redirect\n' +
+  '        } else {\n' +
+  '          alert(\'Error submitting form\')\n' +
+  '        }\n' +
+  '      } catch (error) {\n' +
+  '        console.error(\'Error:\', error)\n' +
+  '        alert(\'Error submitting form\')\n' +
+  '      }\n' +
+  '    }\n' +
+  '\n' +
+  '    return {\n' +
+  '      formData,\n' +
+  '      errors,\n' +
+  '      submitForm\n' +
+  '    }\n' +
+  '  }\n' +
+  '}\n' +
+  '<'+'/script>'
 
-export default {
-  name: '${currentForm.value.name || 'GeneratedForm'}',
-  setup() {
-    const formData = reactive({
-      ${currentForm.value.fields.map(field => {
-        const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
-        return `${fieldName}: ${getDefaultValueForType(field.type)}`
-      }).join(',\n      ')}
-    })
-    
-    const errors = ref({})
-    
-    const rules = ${JSON.stringify(validationRules, null, 6).replace(/"([^"]+)":/g, '$1:')}
-    
-    const validate = () => {
-      const newErrors = {}
-      
-      Object.keys(rules).forEach(field => {
-        const fieldRules = rules[field]
-        
-        if (fieldRules.required && !formData[field]) {
-          newErrors[field] = 'This field is required'
-        } else if (fieldRules.min && formData[field].length < fieldRules.min) {
-          newErrors[field] = \`Minimum length is \${fieldRules.min}\`
-        } else if (fieldRules.max && formData[field].length > fieldRules.max) {
-          newErrors[field] = \`Maximum length is \${fieldRules.max}\`
-        } else if (fieldRules.pattern && !new RegExp(fieldRules.pattern).test(formData[field])) {
-          newErrors[field] = 'Invalid format'
-        }
-      })
-      
-      errors.value = newErrors
-      return Object.keys(newErrors).length === 0
-    }
-    
-    const submitForm = async () => {
-      if (!validate()) {
-        return
-      }
-      
-      try {
-        const response = await fetch('${currentForm.value.endpoint || 'https://api.example.com/submit'}', {
-          method: '${currentForm.value.method || 'POST'}',
-          headers: {
-            'Content-Type': 'application/json',
-            ${Object.entries(currentForm.value.headers || {}).map(([key, value]) => `'${key}': '${value}'`).join(',\n            ')}
-          },
-          body: JSON.stringify(formData)
-        })
-        
-        if (response.ok) {
-          alert('Form submitted successfully!')
-          // Reset form or redirect
-        } else {
-          alert('Error submitting form')
-        }
-      } catch (error) {
-        console.error('Error:', error)
-        alert('Error submitting form')
-      }
-    }
-    
-    return {
-      formData,
-      errors,
-      submitForm
-    }
-  }
-}
-</script>`
-      
       showExportModal.value = true
     }
-    
+
     const generateFieldCode = (field) => {
       const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
       const requiredAttr = field.required ? ' required' : ''
-      const errorDisplay = `<p v-if="errors.${fieldName}" class="mt-2 text-sm text-red-600">{{ errors.${fieldName} }}</p>`
-      
+      const errorDisplay = `<p v-if="errors['${fieldName}']" class="mt-2 text-sm text-red-600">{{ errors['${fieldName}'] }}</p>`
+
       switch (field.type) {
         case 'text':
         case 'email':
@@ -618,7 +619,7 @@ export default {
         >
         ${errorDisplay}
       </div>`
-        
+
         case 'textarea':
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -630,7 +631,7 @@ export default {
         ></textarea>
         ${errorDisplay}
       </div>`
-        
+
         case 'select':
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -644,7 +645,7 @@ export default {
         </select>
         ${errorDisplay}
       </div>`
-        
+
         case 'radio':
           return `<div>
         <span class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</span>
@@ -666,7 +667,7 @@ export default {
         </div>
         ${errorDisplay}
       </div>`
-        
+
         case 'checkbox':
           if (field.options && field.options.length > 1) {
             return `<div>
@@ -702,7 +703,7 @@ export default {
         ${errorDisplay}
       </div>`
           }
-        
+
         default:
           return `<div>
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
@@ -717,51 +718,51 @@ export default {
       </div>`
       }
     }
-    
+
     const generateValidationRules = (field) => {
       const rules = {}
-      
+
       if (field.required) {
         rules.required = true
       }
-      
+
       if (field.validation) {
         if (field.validation.min !== undefined && field.validation.min !== null && field.validation.min !== '') {
           rules.min = parseInt(field.validation.min)
         }
-        
+
         if (field.validation.max !== undefined && field.validation.max !== null && field.validation.max !== '') {
           rules.max = parseInt(field.validation.max)
         }
-        
+
         if (field.validation.pattern) {
           rules.pattern = field.validation.pattern
         }
       }
-      
+
       return rules
     }
-    
-    const getDefaultValueForType = (type) => {
+
+    const getDefaultValueForType = (type, field) => {
       switch (type) {
         case 'checkbox':
-          return 'false'
+          // For a checkbox group with multiple options, return an array
+          // For a single checkbox, return false
+          return field && field.options && field.options.length > 1 ? '[]' : 'false'
         case 'number':
           return '0'
         case 'select':
         case 'radio':
           return "''"
-        case 'checkbox':
-          return '[]'
         default:
           return "''"
       }
     }
-    
+
     const closeExportModal = () => {
       showExportModal.value = false
     }
-    
+
     const copyCode = () => {
       navigator.clipboard.writeText(exportedCode.value)
         .then(() => {
@@ -771,7 +772,7 @@ export default {
           console.error('Failed to copy code: ', err)
         })
     }
-    
+
     return {
       currentForm,
       availableComponents,

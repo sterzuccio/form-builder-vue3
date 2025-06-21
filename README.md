@@ -202,9 +202,17 @@ npm run test
 npm run lint
 ```
 
+## Testing
+
+For detailed instructions on how to test the application locally, please see the [Testing Guide](./TESTING.md).
+
 ## Publishing
 
 For instructions on how to push this project to GitHub and publish it to npm, please see the [Publishing Guide](./PUBLISHING.md).
+
+## Security
+
+For information about security updates and how to handle vulnerabilities, please see the [Security Guide](./SECURITY.md).
 
 ## License
 
