@@ -1,23 +1,30 @@
 {
-  "name": "form-builder-vue3",
-  "version": "0.1.0",
+  "name": "@sterzuccio/form-builder-vue3",
+  "version": "0.1.1",
   "private": false,
   "description": "A Vue 3 form builder component library with drag and drop functionality",
   "keywords": ["vue", "vue3", "form", "form-builder", "drag-and-drop", "component"],
   "author": "Sterzuccio",
   "license": "MIT",
-  "main": "dist/form-builder-vue3.umd.js",
-  "module": "dist/form-builder-vue3.es.js",
-  "unpkg": "dist/form-builder-vue3.umd.min.js",
+  "main": "./dist/form-builder-vue3.umd.js",
+  "module": "./dist/form-builder-vue3.es.js",
+  "browser": "./dist/form-builder-vue3.es.js",
+  "unpkg": "./dist/form-builder-vue3.umd.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/form-builder-vue3.es.js",
+      "require": "./dist/form-builder-vue3.umd.js",
+      "default": "./dist/form-builder-vue3.es.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
   "files": [
-    "dist",
-    "src/components",
-    "src/lib"
+    "dist"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:lib": "vue-cli-service build --target lib --name form-builder-vue3 src/lib/index.js",
+    "build:lib": "vue-cli-service build --target lib --name form-builder-vue3 --dest dist src/lib/index.js",
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit"
   },
