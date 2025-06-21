@@ -31,19 +31,20 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:lib": "vue-cli-service build --target lib --name form-builder-vue3 --dest dist src/lib/index.js",
+    "build:lib": "vite build",
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "uuid": "^8.3.2",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vuex": "^4.0.0",
-    "axios": "^0.27.2",
-    "uuid": "^8.3.2"
+    "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
@@ -55,7 +56,8 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.4.14",
-    "tailwindcss": "^3.1.6"
+    "tailwindcss": "^3.1.6",
+    "vite": "^6.3.5"
   },
   "peerDependencies": {
     "vue": "^3.2.13"

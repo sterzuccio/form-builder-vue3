@@ -39,3 +39,4 @@ Thumbs.db
 /build
 
 PUBLISHING.md
+package-lock.json
