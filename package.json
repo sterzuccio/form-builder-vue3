@@ -1,5 +1,5 @@
 {
-  "name": "@sterzuccio/form-builder-vue3",
+  "name": "form-builder-vue3",
   "version": "0.1.1",
   "private": false,
   "description": "A Vue 3 form builder component library with drag and drop functionality",
