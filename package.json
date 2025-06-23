@@ -1,6 +1,6 @@
 {
   "name": "form-builder-vue3",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": false,
   "description": "A Vue 3 form builder component library with drag and drop functionality",
   "keywords": [
