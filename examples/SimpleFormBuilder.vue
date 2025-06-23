@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">Simple Form Builder Example</h1>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <!-- Form Builder -->
       <div class="bg-white p-6 rounded-lg shadow-md">
@@ -14,7 +14,7 @@
           @form-updated="handleFormUpdated"
         />
       </div>
-      
+
       <!-- Form Preview -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold mb-4">Form Preview</h2>
@@ -27,16 +27,16 @@
         />
       </div>
     </div>
-    
+
     <!-- Exported Code Modal -->
     <div v-if="showExportedCode" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Exported Form Code</h3>
-        
+
         <div class="mb-4">
           <pre class="bg-gray-100 p-4 rounded-md overflow-auto max-h-96"><code>{{ exportedCode }}</code></pre>
         </div>
-        
+
         <div class="flex justify-end">
           <button 
             @click="copyCode" 
@@ -53,18 +53,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Notification Modal -->
+    <NotificationModal
+      v-model="showNotification"
+      :title="notificationTitle"
+      :message="notificationMessage"
+    />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { FormBuilder, FormPreview } from 'form-builder-vue3'
+import { FormBuilder, FormPreview, NotificationModal } from 'form-builder-vue3'
 
 export default {
   name: 'SimpleFormBuilder',
   components: {
     FormBuilder,
-    FormPreview
+    FormPreview,
+    NotificationModal
   },
   setup() {
     // Form data
@@ -103,61 +111,73 @@ export default {
         'X-Custom-Header': 'example'
       }
     })
-    
+
     // Exported code
     const exportedCode = ref('')
     const showExportedCode = ref(false)
-    
+
+    // Notification state
+    const showNotification = ref(false)
+    const notificationTitle = ref('Success')
+    const notificationMessage = ref('')
+
     // Event handlers
     const handleSave = (savedForm) => {
       console.log('Form saved:', savedForm)
       form.value = savedForm
     }
-    
+
     const handleExport = (code) => {
       console.log('Form code exported')
       exportedCode.value = code
       showExportedCode.value = true
     }
-    
+
     const handleFieldAdded = (field) => {
       console.log('Field added:', field)
     }
-    
+
     const handleFormUpdated = (updatedForm) => {
       console.log('Form updated:', updatedForm)
     }
-    
+
     const handleSubmit = (data) => {
       console.log('Form submitted with data:', data)
     }
-    
+
     const handleValidationError = (errors) => {
       console.error('Validation errors:', errors)
     }
-    
+
     const handleSubmitSuccess = (response) => {
       console.log('Form submitted successfully:', response)
     }
-    
+
     const handleSubmitError = (error) => {
       console.error('Error submitting form:', error)
     }
-    
+
     const copyCode = () => {
       navigator.clipboard.writeText(exportedCode.value)
         .then(() => {
-          alert('Code copied to clipboard!')
+          notificationMessage.value = 'Code copied to clipboard!'
+          showNotification.value = true
         })
         .catch(err => {
           console.error('Failed to copy code: ', err)
+          notificationTitle.value = 'Error'
+          notificationMessage.value = 'Failed to copy code to clipboard'
+          showNotification.value = true
         })
     }
-    
+
     return {
       form,
       exportedCode,
       showExportedCode,
+      showNotification,
+      notificationTitle,
+      notificationMessage,
       handleSave,
       handleExport,
       handleFieldAdded,

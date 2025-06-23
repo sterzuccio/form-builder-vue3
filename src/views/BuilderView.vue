@@ -57,11 +57,14 @@
           <div v-if="currentForm.fields.length === 0" class="text-center text-gray-500 py-8">
             Drag and drop components here to build your form
           </div>
-          <div v-else class="space-y-4">
+          <div v-else class="grid grid-cols-2 gap-4">
             <div 
               v-for="(field, index) in currentForm.fields" 
               :key="index"
-              class="p-4 border rounded-md bg-white hover:bg-gray-50 relative"
+              :class="[
+                'p-4 border rounded-md bg-white hover:bg-gray-50 relative',
+                field.width === 'half' ? 'col-span-1' : 'col-span-2'
+              ]"
             >
               <div class="flex justify-between items-start">
                 <div class="w-full">
@@ -83,9 +86,11 @@
                     </div>
                   </div>
                   <div class="text-sm text-gray-500">
+                    <div v-if="field.key">Key: {{ field.key }}</div>
                     <div v-if="field.label">Label: {{ field.label }}</div>
                     <div v-if="field.placeholder">Placeholder: {{ field.placeholder }}</div>
                     <div>Required: {{ field.required ? 'Yes' : 'No' }}</div>
+                    <div>Width: {{ field.width === 'half' ? 'Half Width' : 'Full Width' }}</div>
                     <div v-if="field.validation">
                       Validation: 
                       <span v-if="field.validation.min">Min: {{ field.validation.min }}</span>
@@ -178,6 +183,19 @@
           </div>
 
           <div>
+            <label for="field-key" class="block text-sm font-medium text-gray-700">Key</label>
+            <input 
+              type="text" 
+              id="field-key" 
+              v-model="editingField.key" 
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="{ 'border-red-500': fieldErrors.key }"
+              @input="keyManuallyEdited = true"
+            >
+            <p v-if="fieldErrors.key" class="mt-1 text-sm text-red-600">{{ fieldErrors.key }}</p>
+          </div>
+
+          <div>
             <label for="field-placeholder" class="block text-sm font-medium text-gray-700">Placeholder</label>
             <input 
               type="text" 
@@ -195,6 +213,33 @@
               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
             >
             <label for="field-required" class="ml-2 block text-sm text-gray-900">Required</label>
+          </div>
+
+          <!-- Field Width Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Field Width</label>
+            <div class="flex space-x-4">
+              <div class="flex items-center">
+                <input 
+                  type="radio" 
+                  id="field-width-full" 
+                  v-model="editingField.width" 
+                  value="full" 
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                >
+                <label for="field-width-full" class="ml-2 block text-sm text-gray-900">Full Width</label>
+              </div>
+              <div class="flex items-center">
+                <input 
+                  type="radio" 
+                  id="field-width-half" 
+                  v-model="editingField.width" 
+                  value="half" 
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                >
+                <label for="field-width-half" class="ml-2 block text-sm text-gray-900">Half Width</label>
+              </div>
+            </div>
           </div>
 
           <!-- Validation Options -->
@@ -330,16 +375,27 @@
         </div>
       </div>
     </div>
+
+    <!-- Notification Modal -->
+    <NotificationModal
+      v-model="showNotification"
+      :title="notificationTitle"
+      :message="notificationMessage"
+      :button-text="notificationButtonText"
+      :timeout="notificationTimeout"
+    />
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import NotificationModal from "@/lib/components/NotificationModal.vue";
 
 export default {
   name: 'BuilderView',
+  components: {NotificationModal},
   setup() {
     const store = useStore()
     const router = useRouter()
@@ -357,10 +413,19 @@ export default {
     const showFieldModal = ref(false)
     const editingField = ref({})
     const editingFieldIndex = ref(-1)
+    const fieldErrors = ref({})
+    const keyManuallyEdited = ref(false)
 
     // Code export
     const showExportModal = ref(false)
     const exportedCode = ref('')
+
+    // Notification modal
+    const showNotification = ref(false)
+    const notificationTitle = ref('Notification')
+    const notificationMessage = ref('')
+    const notificationButtonText = ref('OK')
+    const notificationTimeout = ref(3000) // Auto-close after 3 seconds
 
     onMounted(() => {
       // Check if we're editing an existing form
@@ -394,12 +459,18 @@ export default {
     }
 
     const createDefaultField = (type) => {
+      const componentLabel = getComponentLabel(type)
+      // Generate key from label: convert to lowercase and remove spaces
+      const generatedKey = componentLabel.toLowerCase().replace(/\s+/g, '')
+
       const field = {
         type,
-        label: getComponentLabel(type),
+        key: generatedKey, // Key based on the field's label
+        label: componentLabel,
         placeholder: '',
         required: false,
-        validation: {}
+        validation: {},
+        width: 'full' // Default width: full or half
       }
 
       if (['select', 'radio', 'checkbox'].includes(type)) {
@@ -431,6 +502,26 @@ export default {
     }
 
     const saveField = () => {
+      // Clear previous errors
+      fieldErrors.value = {}
+
+      // Check if key is empty
+      if (!editingField.value.key || editingField.value.key.trim() === '') {
+        fieldErrors.value.key = 'Key cannot be empty'
+        return
+      }
+
+      // Check for duplicate keys
+      const duplicateKeyIndex = currentForm.value.fields.findIndex((field, index) => 
+        field.key === editingField.value.key && index !== editingFieldIndex.value
+      )
+
+      if (duplicateKeyIndex !== -1) {
+        fieldErrors.value.key = 'This key is already used by another field'
+        return
+      }
+
+      // If no errors, save the field
       store.dispatch('updateField', {
         index: editingFieldIndex.value,
         field: editingField.value
@@ -442,7 +533,19 @@ export default {
       showFieldModal.value = false
       editingField.value = {}
       editingFieldIndex.value = -1
+      fieldErrors.value = {}
+      keyManuallyEdited.value = false
     }
+
+    // Watch for label changes to update key automatically
+    watch(() => editingField.value.label, (newLabel) => {
+      // Only update key if we're editing a field and the key hasn't been manually edited
+      if (showFieldModal.value && newLabel && !keyManuallyEdited.value) {
+        // Generate key from label: convert to lowercase and remove spaces
+        const generatedKey = newLabel.toLowerCase().replace(/\s+/g, '')
+        editingField.value.key = generatedKey
+      }
+    })
 
     const deleteField = (index) => {
       if (confirm('Are you sure you want to delete this field?')) {
@@ -486,7 +589,10 @@ export default {
       })
 
       store.dispatch('saveForm').then(savedForm => {
-        alert('Form saved successfully!')
+        notificationTitle.value = 'Success'
+        notificationMessage.value = 'Form saved successfully!'
+        notificationButtonText.value = 'OK'
+        showNotification.value = true
         // If it's a new form, update the URL to include the form ID
         if (!route.query.id) {
           router.replace({ path: '/builder', query: { id: savedForm.id } })
@@ -503,7 +609,7 @@ export default {
 
       const validationRules = currentForm.value.fields.reduce((rules, field) => {
         if (field.required || field.validation) {
-          rules[field.name || field.type + field.label.replace(/\s+/g, '')] = generateValidationRules(field)
+          rules[field.key || field.type + field.label.replace(/\s+/g, '')] = generateValidationRules(field)
         }
         return rules
       }, {})
@@ -517,6 +623,26 @@ export default {
   '        Submit\n' +
   '      </button>\n' +
   '    </div>\n' +
+  '    \n' +
+  '    <!-- Notification Modal -->\n' +
+  '    <div v-if="showNotification" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">\n' +
+  '      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">\n' +
+  '        <h3 class="text-lg font-medium text-gray-900 mb-4">{{ notificationTitle }}</h3>\n' +
+  '        \n' +
+  '        <div class="mb-6">\n' +
+  '          <p class="text-gray-700">{{ notificationMessage }}</p>\n' +
+  '        </div>\n' +
+  '        \n' +
+  '        <div class="flex justify-end">\n' +
+  '          <button \n' +
+  '            @click="closeNotification" \n' +
+  '            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"\n' +
+  '          >\n' +
+  '            OK\n' +
+  '          </button>\n' +
+  '        </div>\n' +
+  '      </div>\n' +
+  '    </div>\n' +
   '  </form>\n' +
   '</template>\n' +
   '\n' +
@@ -528,12 +654,27 @@ export default {
   '  setup() {\n' +
   '    const formData = reactive({\n' +
   '      ' + currentForm.value.fields.map(field => {
-          const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
+          const fieldName = field.key || field.type + field.label.replace(/\s+/g, '')
           return fieldName + ': ' + getDefaultValueForType(field.type, field)
         }).join(',\n      ') + '\n' +
   '    })\n' +
   '\n' +
   '    const errors = ref({})\n' +
+  '    \n' +
+  '    // Notification state\n' +
+  '    const showNotification = ref(false)\n' +
+  '    const notificationTitle = ref(\'Notification\')\n' +
+  '    const notificationMessage = ref(\'\')\n' +
+  '    \n' +
+  '    const closeNotification = () => {\n' +
+  '      showNotification.value = false\n' +
+  '    }\n' +
+  '    \n' +
+  '    const showNotificationModal = (title, message) => {\n' +
+  '      notificationTitle.value = title\n' +
+  '      notificationMessage.value = message\n' +
+  '      showNotification.value = true\n' +
+  '    }\n' +
   '\n' +
   '    const rules = ' + JSON.stringify(validationRules, null, 6).replace(/"([^"]+)":/g, '$1:') + '\n' +
   '\n' +
@@ -574,21 +715,25 @@ export default {
   '        })\n' +
   '\n' +
   '        if (response.ok) {\n' +
-  '          alert(\'Form submitted successfully!\')\n' +
+  '          showNotificationModal(\'Success\', \'Form submitted successfully!\')\n' +
   '          // Reset form or redirect\n' +
   '        } else {\n' +
-  '          alert(\'Error submitting form\')\n' +
+  '          showNotificationModal(\'Error\', \'Error submitting form\')\n' +
   '        }\n' +
   '      } catch (error) {\n' +
   '        console.error(\'Error:\', error)\n' +
-  '        alert(\'Error submitting form\')\n' +
+  '        showNotificationModal(\'Error\', \'Error submitting form\')\n' +
   '      }\n' +
   '    }\n' +
   '\n' +
   '    return {\n' +
   '      formData,\n' +
   '      errors,\n' +
-  '      submitForm\n' +
+  '      submitForm,\n' +
+  '      showNotification,\n' +
+  '      notificationTitle,\n' +
+  '      notificationMessage,\n' +
+  '      closeNotification\n' +
   '    }\n' +
   '  }\n' +
   '}\n' +
@@ -598,9 +743,10 @@ export default {
     }
 
     const generateFieldCode = (field) => {
-      const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
+      const fieldName = field.key || field.type + field.label.replace(/\s+/g, '')
       const requiredAttr = field.required ? ' required' : ''
       const errorDisplay = `<p v-if="errors['${fieldName}']" class="mt-2 text-sm text-red-600">{{ errors['${fieldName}'] }}</p>`
+      const widthClass = field.width === 'half' ? 'w-1/2 px-2' : 'w-full px-2'
 
       switch (field.type) {
         case 'text':
@@ -608,7 +754,7 @@ export default {
         case 'password':
         case 'number':
         case 'date':
-          return `<div>
+          return `<div class="${widthClass} mb-4">
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
         <input 
           type="${field.type}" 
@@ -621,7 +767,7 @@ export default {
       </div>`
 
         case 'textarea':
-          return `<div>
+          return `<div class="${widthClass} mb-4">
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
         <textarea 
           id="${fieldName}" 
@@ -633,7 +779,7 @@ export default {
       </div>`
 
         case 'select':
-          return `<div>
+          return `<div class="${widthClass} mb-4">
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
         <select 
           id="${fieldName}" 
@@ -647,7 +793,7 @@ export default {
       </div>`
 
         case 'radio':
-          return `<div>
+          return `<div class="${widthClass} mb-4">
         <span class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</span>
         <div class="mt-2 space-y-2">
           ${field.options.map(option => `
@@ -670,7 +816,7 @@ export default {
 
         case 'checkbox':
           if (field.options && field.options.length > 1) {
-            return `<div>
+            return `<div class="${widthClass} mb-4">
         <span class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</span>
         <div class="mt-2 space-y-2">
           ${field.options.map(option => `
@@ -690,7 +836,7 @@ export default {
         ${errorDisplay}
       </div>`
           } else {
-            return `<div class="flex items-center">
+            return `<div class="${widthClass} mb-4 flex items-center">
         <input 
           type="checkbox" 
           id="${fieldName}" 
@@ -705,7 +851,7 @@ export default {
           }
 
         default:
-          return `<div>
+          return `<div class="${widthClass} mb-4">
         <label for="${fieldName}" class="block text-sm font-medium text-gray-700">${field.label}${field.required ? ' *' : ''}</label>
         <input 
           type="text" 
@@ -766,10 +912,17 @@ export default {
     const copyCode = () => {
       navigator.clipboard.writeText(exportedCode.value)
         .then(() => {
-          alert('Code copied to clipboard!')
+          notificationTitle.value = 'Success'
+          notificationMessage.value = 'Code copied to clipboard!'
+          notificationButtonText.value = 'OK'
+          showNotification.value = true
         })
         .catch(err => {
           console.error('Failed to copy code: ', err)
+          notificationTitle.value = 'Error'
+          notificationMessage.value = 'Failed to copy code to clipboard'
+          notificationButtonText.value = 'OK'
+          showNotification.value = true
         })
     }
 
@@ -780,8 +933,16 @@ export default {
       headerKeys,
       showFieldModal,
       editingField,
+      editingFieldIndex,
+      fieldErrors,
+      keyManuallyEdited,
       showExportModal,
       exportedCode,
+      showNotification,
+      notificationTitle,
+      notificationMessage,
+      notificationButtonText,
+      notificationTimeout,
       onDragStart,
       onDrop,
       getComponentLabel,

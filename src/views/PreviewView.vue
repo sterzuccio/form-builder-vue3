@@ -20,7 +20,15 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <form @submit.prevent="submitForm" class="space-y-6">
-          <div v-for="(field, index) in currentForm.fields" :key="index" class="form-field">
+          <div class="grid grid-cols-2 gap-4">
+            <div 
+              v-for="(field, index) in currentForm.fields" 
+              :key="index" 
+              :class="[
+                'form-field',
+                field.width === 'half' ? 'col-span-1' : 'col-span-2'
+              ]"
+            >
             <!-- Text Input -->
             <div v-if="field.type === 'text'" class="form-group">
               <label :for="getFieldId(field)" class="block text-sm font-medium text-gray-700">
@@ -208,7 +216,7 @@
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
           </div>
-
+          </div>
           <div v-if="currentForm.fields.length === 0" class="text-center text-gray-500 py-8">
             No fields added to this form yet. Go back to the editor to add fields.
           </div>
@@ -229,7 +237,7 @@
     <div v-if="showResultModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Form Submission Result</h3>
-        
+
         <div v-if="submissionSuccess" class="text-green-600 mb-4">
           <p>Form submitted successfully!</p>
         </div>
@@ -237,7 +245,7 @@
           <p>Error submitting form.</p>
           <p class="text-sm">{{ submissionError }}</p>
         </div>
-        
+
         <div class="mt-6 flex justify-end">
           <button 
             @click="closeResultModal" 
@@ -261,16 +269,16 @@ export default {
   setup() {
     const store = useStore()
     const route = useRoute()
-    
+
     const currentForm = computed(() => store.getters.getCurrentForm)
     const formData = reactive({})
     const errors = ref({})
-    
+
     // Form submission result
     const showResultModal = ref(false)
     const submissionSuccess = ref(false)
     const submissionError = ref('')
-    
+
     onMounted(() => {
       // Check if we're previewing a specific form
       const formId = route.query.id
@@ -281,11 +289,11 @@ export default {
           store.dispatch('setCurrentForm', {...form})
         }
       }
-      
+
       // Initialize form data with default values
       currentForm.value.fields.forEach(field => {
         const fieldId = getFieldId(field)
-        
+
         switch (field.type) {
           case 'checkbox':
             if (field.options && field.options.length > 1) {
@@ -302,30 +310,30 @@ export default {
         }
       })
     })
-    
+
     const getFieldId = (field) => {
-      return field.name || `${field.type}_${field.label.replace(/\s+/g, '')}`
+      return field.key || field.name || `${field.type}_${field.label.replace(/\s+/g, '')}`
     }
-    
+
     const validate = () => {
       const newErrors = {}
-      
+
       currentForm.value.fields.forEach(field => {
         const fieldId = getFieldId(field)
         const value = formData[fieldId]
-        
+
         // Required validation
         if (field.required && (value === '' || value === null || value === undefined || 
             (Array.isArray(value) && value.length === 0))) {
           newErrors[fieldId] = 'This field is required'
           return
         }
-        
+
         // Skip other validations if field is empty and not required
         if (value === '' || value === null || value === undefined) {
           return
         }
-        
+
         // Validation rules
         if (field.validation) {
           // Min/Max validation for text, textarea, password
@@ -336,7 +344,7 @@ export default {
               newErrors[fieldId] = `Maximum length is ${field.validation.max}`
             }
           }
-          
+
           // Min/Max validation for number
           if (field.type === 'number' && !isNaN(value)) {
             const numValue = Number(value)
@@ -346,7 +354,7 @@ export default {
               newErrors[fieldId] = `Maximum value is ${field.validation.max}`
             }
           }
-          
+
           // Pattern validation
           if (field.validation.pattern && typeof value === 'string') {
             try {
@@ -360,16 +368,16 @@ export default {
           }
         }
       })
-      
+
       errors.value = newErrors
       return Object.keys(newErrors).length === 0
     }
-    
+
     const submitForm = async () => {
       if (!validate()) {
         return
       }
-      
+
       // If no endpoint is specified, just show success
       if (!currentForm.value.endpoint) {
         submissionSuccess.value = true
@@ -377,7 +385,7 @@ export default {
         showResultModal.value = true
         return
       }
-      
+
       try {
         const response = await fetch(currentForm.value.endpoint, {
           method: currentForm.value.method || 'POST',
@@ -387,7 +395,7 @@ export default {
           },
           body: JSON.stringify(formData)
         })
-        
+
         if (response.ok) {
           submissionSuccess.value = true
           submissionError.value = ''
@@ -399,14 +407,14 @@ export default {
         submissionSuccess.value = false
         submissionError.value = error.message || 'Network error'
       }
-      
+
       showResultModal.value = true
     }
-    
+
     const closeResultModal = () => {
       showResultModal.value = false
     }
-    
+
     return {
       currentForm,
       formData,

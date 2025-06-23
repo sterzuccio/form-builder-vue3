@@ -13,7 +13,7 @@ A powerful form builder component library for Vue 3, featuring drag-and-drop for
 - **Component Selection**: Choose which components to use when instantiating the library
 - **Endpoint Configuration**: Configure endpoints, HTTP methods, and custom headers
 - **Field Validation**: Support for required, min, max, and pattern validations
-- **Customizable Fields**: Customize labels, placeholders, required status, and options for select/radio fields
+- **Customizable Fields**: Customize labels, placeholders, required status, field width, and options for select/radio fields
 - **Comprehensive Tests**: Includes unit and integration tests for all components
 
 ## Available Field Types
@@ -229,6 +229,7 @@ Each field in the form has the following properties:
 | label | String | Label for the field |
 | placeholder | String | Placeholder text for the field |
 | required | Boolean | Whether the field is required |
+| width | String | Width of the field ('full' or 'half'). Full width spans the entire form, half width allows two fields to be placed side by side |
 | validation | Object | Validation rules for the field (e.g., min, max, pattern) |
 | options | Array | Options for select, radio, and checkbox fields |
 
@@ -262,10 +263,6 @@ npm run lint
 ## Testing
 
 For detailed instructions on how to test the application locally, please see the [Testing Guide](./TESTING.md).
-
-## Publishing
-
-For instructions on how to push this project to GitHub and publish it to npm, please see the [Publishing Guide](./PUBLISHING.md).
 
 ## Security
 

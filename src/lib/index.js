@@ -2,6 +2,7 @@
 import { createStore } from 'vuex'
 import FormBuilder from './components/FormBuilder.vue'
 import FormPreview from './components/FormPreview.vue'
+import NotificationModal from './components/NotificationModal.vue'
 import { formBuilderStore } from './store'
 import '../assets/css/tailwind.css'
 
@@ -11,6 +12,7 @@ const FormBuilderPlugin = {
     // Register components
     app.component('FormBuilder', FormBuilder)
     app.component('FormPreview', FormPreview)
+    app.component('NotificationModal', NotificationModal)
 
     // Setup store if Vuex is available and not disabled
     if (!options.disableStore) {
@@ -39,7 +41,7 @@ const FormBuilderPlugin = {
 }
 
 // Export components individually for à la carte usage
-export { FormBuilder, FormPreview, formBuilderStore }
+export { FormBuilder, FormPreview, NotificationModal, formBuilderStore }
 
 // Export the plugin as default
 export default FormBuilderPlugin
