@@ -41,13 +41,22 @@
               >
                 {{ saveButtonText }}
               </button>
-              <button 
-                v-if="showExportButton"
-                @click="exportFormCode" 
-                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {{ exportButtonText }}
-              </button>
+              <div v-if="showExportButton" class="flex space-x-2">
+                <select 
+                  v-model="selectedExportFormat"
+                  class="block border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option v-for="format in exportFormats" :key="format.value" :value="format.value">
+                    {{ format.label }}
+                  </option>
+                </select>
+                <button 
+                  @click="exportFormCode" 
+                  class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  {{ exportButtonText }}
+                </button>
+              </div>
             </slot>
           </div>
         </div>
@@ -87,6 +96,7 @@
                     </div>
                   </div>
                   <div class="text-sm text-gray-500">
+                    <div v-if="field.key">Key: {{ field.key }}</div>
                     <div v-if="field.label">Label: {{ field.label }}</div>
                     <div v-if="field.placeholder">Placeholder: {{ field.placeholder }}</div>
                     <div>Required: {{ field.required ? 'Yes' : 'No' }}</div>
@@ -175,6 +185,20 @@
               v-model="editingField.label" 
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
+          </div>
+
+          <div style="display: block !important;">
+            <label for="field-key" class="block text-sm font-medium text-gray-700">{{ fieldKeyText }}</label>
+            <input 
+              type="text" 
+              id="field-key" 
+              v-model="editingField.key" 
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="{ 'border-red-500': fieldErrors.key }"
+              @input="keyManuallyEdited = true"
+              data-testid="field-key-input"
+            >
+            <p v-if="fieldErrors.key" class="mt-1 text-sm text-red-600">{{ fieldErrors.key }}</p>
           </div>
 
           <div>
@@ -334,8 +358,10 @@
 </template>
 
 <script>
+/* eslint-disable no-useless-escape */
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
+import { v4 as uuidv4 } from 'uuid'
 
 export default {
   name: 'FormBuilder',
@@ -354,6 +380,14 @@ export default {
     },
     // Component configuration
     components: {
+      type: Array,
+      default: () => []
+    },
+    customFields: {
+      type: Array,
+      default: () => []
+    },
+    activeFieldKeys: {
       type: Array,
       default: () => []
     },
@@ -390,6 +424,10 @@ export default {
     formSettingsTitle: {
       type: String,
       default: 'Form Settings'
+    },
+    exportFormatsTitle: {
+      type: String,
+      default: 'Export Format'
     },
     formNameLabel: {
       type: String,
@@ -454,6 +492,10 @@ export default {
     fieldLabelText: {
       type: String,
       default: 'Label'
+    },
+    fieldKeyText: {
+      type: String,
+      default: 'Key'
     },
     fieldPlaceholderText: {
       type: String,
@@ -528,6 +570,14 @@ export default {
       type: Array,
       default: () => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     },
+    exportFormats: {
+      type: Array,
+      default: () => [
+        { value: 'vue', label: 'Vue/Nuxt Component' },
+        { value: 'json', label: 'JSON (Importable)' },
+        { value: 'html', label: 'Embeddable HTML' }
+      ]
+    },
     storeModuleName: {
       type: String,
       default: 'formBuilder'
@@ -543,7 +593,8 @@ export default {
     'field-added',
     'field-updated',
     'field-deleted',
-    'form-updated'
+    'form-updated',
+    'get-form-code'
   ],
   setup(props, { emit }) {
     let store
@@ -589,25 +640,43 @@ export default {
 
     // Available components
     const availableComponents = computed(() => {
+      let components = []
+
       if (props.components && props.components.length > 0) {
-        return props.components
+        components = [...props.components]
+      } else {
+        const storeComponents = getStoreGetter('getAvailableComponents')
+        if (storeComponents) {
+          components = [...storeComponents]
+        } else {
+          // Default components if store is not available
+          components = [
+            { type: 'text', label: 'Text Input', icon: 'text-fields' },
+            { type: 'textarea', label: 'Text Area', icon: 'subject' },
+            { type: 'number', label: 'Number', icon: 'filter-9-plus' },
+            { type: 'select', label: 'Select', icon: 'arrow-drop-down-circle' },
+            { type: 'radio', label: 'Radio', icon: 'radio-button-checked' },
+            { type: 'checkbox', label: 'Checkbox', icon: 'check-box' },
+            { type: 'date', label: 'Date', icon: 'date-range' },
+            { type: 'email', label: 'Email', icon: 'email' },
+            { type: 'password', label: 'Password', icon: 'vpn-key' }
+          ]
+        }
       }
-      const storeComponents = getStoreGetter('getAvailableComponents')
-      if (storeComponents) {
-        return storeComponents
+
+      // Add custom fields
+      if (props.customFields && props.customFields.length > 0) {
+        components = [...components, ...props.customFields]
       }
-      // Default components if store is not available
-      return [
-        { type: 'text', label: 'Text Input', icon: 'text-fields' },
-        { type: 'textarea', label: 'Text Area', icon: 'subject' },
-        { type: 'number', label: 'Number', icon: 'filter-9-plus' },
-        { type: 'select', label: 'Select', icon: 'arrow-drop-down-circle' },
-        { type: 'radio', label: 'Radio', icon: 'radio-button-checked' },
-        { type: 'checkbox', label: 'Checkbox', icon: 'check-box' },
-        { type: 'date', label: 'Date', icon: 'date-range' },
-        { type: 'email', label: 'Email', icon: 'email' },
-        { type: 'password', label: 'Password', icon: 'vpn-key' }
-      ]
+
+      // Filter components based on activeFieldKeys if provided
+      if (props.activeFieldKeys && props.activeFieldKeys.length > 0) {
+        components = components.filter(component => 
+          props.activeFieldKeys.includes(component.type)
+        )
+      }
+
+      return components
     })
 
     // Computed class for main content based on sidebar visibility
@@ -629,10 +698,13 @@ export default {
     const showFieldModal = ref(false)
     const editingField = ref({})
     const editingFieldIndex = ref(-1)
+    const fieldErrors = ref({})
+    const keyManuallyEdited = ref(false)
 
     // Code export
     const showExportModal = ref(false)
     const exportedCode = ref('')
+    const selectedExportFormat = ref('vue')
 
     onMounted(() => {
       // Initialize headers
@@ -669,9 +741,15 @@ export default {
     }
 
     const createDefaultField = (type) => {
+      const componentLabel = getComponentLabel(type)
+      // Generate key from label: convert to lowercase and remove spaces
+      const generatedKey = componentLabel.toLowerCase().replace(/\s+/g, '')
+
       const field = {
+        id: uuidv4(),
+        key: generatedKey, // Key based on the field's label
         type,
-        label: getComponentLabel(type),
+        label: componentLabel,
         placeholder: '',
         required: false,
         validation: {}
@@ -702,10 +780,33 @@ export default {
         editingField.value.validation = {}
       }
 
+      // Reset the key manually edited flag
+      keyManuallyEdited.value = false
+
       showFieldModal.value = true
     }
 
     const saveField = () => {
+      // Clear previous errors
+      fieldErrors.value = {}
+
+      // Check if key is empty
+      if (!editingField.value.key || editingField.value.key.trim() === '') {
+        fieldErrors.value.key = 'Key cannot be empty'
+        return
+      }
+
+      // Check for duplicate keys
+      const duplicateKeyIndex = currentForm.value.fields.findIndex((field, index) => 
+        field.key === editingField.value.key && index !== editingFieldIndex.value
+      )
+
+      if (duplicateKeyIndex !== -1) {
+        fieldErrors.value.key = 'This key is already used by another field'
+        return
+      }
+
+      // If no errors, save the field
       currentForm.value.fields.splice(editingFieldIndex.value, 1, editingField.value)
       emit('field-updated', { index: editingFieldIndex.value, field: editingField.value })
       emit('form-updated', currentForm.value)
@@ -716,7 +817,19 @@ export default {
       showFieldModal.value = false
       editingField.value = {}
       editingFieldIndex.value = -1
+      fieldErrors.value = {}
+      keyManuallyEdited.value = false
     }
+
+    // Watch for label changes to update key automatically
+    watch(() => editingField.value.label, (newLabel) => {
+      // Only update key if we're editing a field and the key hasn't been manually edited
+      if (showFieldModal.value && newLabel && !keyManuallyEdited.value) {
+        // Generate key from label: convert to lowercase and remove spaces
+        const generatedKey = newLabel.toLowerCase().replace(/\s+/g, '')
+        editingField.value.key = generatedKey
+      }
+    })
 
     const deleteField = (index) => {
       if (confirm('Are you sure you want to delete this field?')) {
@@ -768,8 +881,8 @@ export default {
       emit('save', currentForm.value)
     }
 
-    // Export form code
-    const exportFormCode = () => {
+    // Generate form code
+    const generateFormCode = () => {
       // Generate Vue component code for the form
       const formFields = currentForm.value.fields.map(field => {
         return generateFieldCode(field)
@@ -783,7 +896,7 @@ export default {
       }, {})
 
       // Use string concatenation to avoid Vue parsing the template tags
-      exportedCode.value = '<template>\n' +
+      return '<template>\n' +
   '  <form @submit.prevent="submitForm" class="space-y-6">\n' +
   '    ' + formFields + '\n' +
   '    <div>\n' +
@@ -867,9 +980,248 @@ export default {
   '  }\n' +
   '}\n' +
   '</' + 'script>'
+    }
 
+    // Get form code without displaying modal
+    const getFormCode = () => {
+      const code = generateFormCode()
+      emit('get-form-code', code)
+      return code
+    }
+
+    // Export form code
+    const exportFormCode = () => {
+      switch (selectedExportFormat.value) {
+        case 'vue':
+          exportedCode.value = generateFormCode()
+          break
+        case 'json':
+          exportedCode.value = generateJsonCode()
+          break
+        case 'html':
+          exportedCode.value = generateHtmlCode()
+          break
+        default:
+          exportedCode.value = generateFormCode()
+      }
       showExportModal.value = true
       emit('export', exportedCode.value)
+    }
+
+    // Generate JSON code for the form
+    const generateJsonCode = () => {
+      return JSON.stringify(currentForm.value, null, 2)
+    }
+
+    // Generate embeddable HTML code for the form
+    const generateHtmlCode = () => {
+      const formFields = currentForm.value.fields.map(field => {
+        return generateHtmlFieldCode(field)
+      }).join('\n      ')
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${currentForm.value.name || 'Generated Form'}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    input[type="checkbox"], input[type="radio"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    .checkbox-label, .radio-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4338ca;
+    }
+    .error {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <form id="generatedForm" action="${currentForm.value.endpoint || ''}" method="${currentForm.value.method || 'POST'}">
+    <h2>${currentForm.value.name || 'Generated Form'}</h2>
+
+    ${formFields}
+
+    <div class="form-group">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <script>
+    document.getElementById('generatedForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Basic validation
+      let isValid = true;
+      const form = this;
+      const requiredFields = form.querySelectorAll('[required]');
+
+      requiredFields.forEach(function(field) {
+        const errorElement = document.getElementById(field.id + '-error');
+        if (!field.value) {
+          isValid = false;
+          if (errorElement) {
+            errorElement.textContent = 'This field is required';
+          }
+        } else if (errorElement) {
+          errorElement.textContent = '';
+        }
+      });
+
+      if (isValid) {
+        // You can add AJAX submission here if needed
+        form.submit();
+      }
+    });
+  <\/script>
+<\/body>
+<\/html>`
+    }
+
+    // Generate HTML field code
+    const generateHtmlFieldCode = (field) => {
+      const fieldName = field.name || field.type + field.label.replace(/\s+/g, '')
+      const requiredAttr = field.required ? ' required' : ''
+      const errorDiv = `<div id="${fieldName}-error" class="error"></div>`
+
+      switch (field.type) {
+        case 'text':
+        case 'email':
+        case 'password':
+        case 'number':
+        case 'date':
+          return `<div class="form-group">
+      <label for="${fieldName}">${field.label}${field.required ? ' *' : ''}</label>
+      <input 
+        type="${field.type}" 
+        id="${fieldName}" 
+        name="${fieldName}"
+        placeholder="${field.placeholder || ''}"${requiredAttr}
+      >
+      ${errorDiv}
+    </div>`
+
+        case 'textarea':
+          return `<div class="form-group">
+      <label for="${fieldName}">${field.label}${field.required ? ' *' : ''}</label>
+      <textarea 
+        id="${fieldName}" 
+        name="${fieldName}"
+        placeholder="${field.placeholder || ''}"${requiredAttr}
+      ></textarea>
+      ${errorDiv}
+    </div>`
+
+        case 'select':
+          return `<div class="form-group">
+      <label for="${fieldName}">${field.label}${field.required ? ' *' : ''}</label>
+      <select 
+        id="${fieldName}" 
+        name="${fieldName}"${requiredAttr}
+      >
+        <option value="" disabled selected>Select an option</option>
+        ${field.options.map(option => `<option value="${option.value}">${option.label}</option>`).join('\n        ')}
+      </select>
+      ${errorDiv}
+    </div>`
+
+        case 'radio':
+          return `<div class="form-group">
+      <label>${field.label}${field.required ? ' *' : ''}</label>
+      ${field.options.map((option, index) => `
+      <div class="radio-label">
+        <input 
+          type="radio" 
+          id="${fieldName}_${index}" 
+          name="${fieldName}" 
+          value="${option.value}"${index === 0 && field.required ? requiredAttr : ''}
+        >
+        <label for="${fieldName}_${index}">${option.label}</label>
+      </div>`).join('')}
+      ${errorDiv}
+    </div>`
+
+        case 'checkbox':
+          if (field.options && field.options.length > 1) {
+            return `<div class="form-group">
+      <label>${field.label}${field.required ? ' *' : ''}</label>
+      ${field.options.map((option, index) => `
+      <div class="checkbox-label">
+        <input 
+          type="checkbox" 
+          id="${fieldName}_${index}" 
+          name="${fieldName}[]" 
+          value="${option.value}"
+        >
+        <label for="${fieldName}_${index}">${option.label}</label>
+      </div>`).join('')}
+      ${errorDiv}
+    </div>`
+          } else {
+            return `<div class="form-group checkbox-label">
+      <input 
+        type="checkbox" 
+        id="${fieldName}" 
+        name="${fieldName}"${requiredAttr}
+      >
+      <label for="${fieldName}">${field.label}${field.required ? ' *' : ''}</label>
+      ${errorDiv}
+    </div>`
+          }
+
+        default:
+          return `<div class="form-group">
+      <label for="${fieldName}">${field.label}${field.required ? ' *' : ''}</label>
+      <input 
+        type="text" 
+        id="${fieldName}" 
+        name="${fieldName}"
+        placeholder="${field.placeholder || ''}"${requiredAttr}
+      >
+      ${errorDiv}
+    </div>`
+      }
     }
 
     const generateFieldCode = (field) => {
@@ -1061,6 +1413,7 @@ export default {
       editingField,
       showExportModal,
       exportedCode,
+      selectedExportFormat,
       onDragStart,
       onDrop,
       getComponentLabel,
@@ -1073,6 +1426,7 @@ export default {
       addHeader,
       saveForm,
       exportFormCode,
+      getFormCode,
       closeExportModal,
       copyCode
     }

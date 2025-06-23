@@ -8,7 +8,7 @@ A powerful form builder component library for Vue 3, featuring drag-and-drop for
 - **Tailwind CSS**: Modern, responsive UI with Tailwind CSS
 - **Drag and Drop Form Building**: Easily build forms by dragging and dropping components
 - **Live Preview**: Preview your form as you build it
-- **Form Export**: Download the form code to embed in other projects
+- **Multiple Export Formats**: Export forms as Vue/Nuxt components, JSON (importable), or embeddable HTML
 - **Form Saving**: Save forms in JSON format for easy maintenance
 - **Component Selection**: Choose which components to use when instantiating the library
 - **Endpoint Configuration**: Configure endpoints, HTTP methods, and custom headers
@@ -62,9 +62,11 @@ app.mount('#app')
   <div>
     <h1>Form Builder</h1>
     <FormBuilder 
+      ref="formBuilder"
       :initial-form="myForm" 
       @save="handleSave"
       @export="handleExport"
+      @get-form-code="handleGetFormCode"
     />
 
     <h1>Form Preview</h1>
@@ -72,6 +74,10 @@ app.mount('#app')
       :form="myForm" 
       @submit="handleSubmit"
     />
+
+    <button @click="getAndSaveFormCode" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+      Get Form Code
+    </button>
   </div>
 </template>
 
@@ -85,6 +91,7 @@ export default {
     FormPreview
   },
   setup() {
+    const formBuilder = ref(null)
     const myForm = ref({
       name: 'My Form',
       fields: [],
@@ -104,14 +111,37 @@ export default {
       console.log('Exported code:', code)
     }
 
+    const handleGetFormCode = (code) => {
+      console.log('Got form code:', code)
+      // You can save the code wherever you want
+      saveCodeToCustomLocation(code)
+    }
+
+    const getAndSaveFormCode = () => {
+      // Programmatically get the form code
+      const code = formBuilder.value.getFormCode()
+      console.log('Got form code programmatically:', code)
+      // You can save the code wherever you want
+      saveCodeToCustomLocation(code)
+    }
+
+    const saveCodeToCustomLocation = (code) => {
+      // Example function to save the code to a custom location
+      // This could be a file download, localStorage, or any other storage method
+      console.log('Saving code to custom location:', code)
+    }
+
     const handleSubmit = (data) => {
       console.log('Form submitted with data:', data)
     }
 
     return {
+      formBuilder,
       myForm,
       handleSave,
       handleExport,
+      handleGetFormCode,
+      getAndSaveFormCode,
       handleSubmit
     }
   }
@@ -149,12 +179,14 @@ app.mount('#app')
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| initialForm | Object | `{}` | Initial form data |
+| initialForm | Object | `{}` | Initial form data. Each field in the form will automatically receive a unique ID and key. |
 | components | Array | `[]` | Custom components to use |
+| customFields | Array | `[]` | Custom fields that can be added via drag and drop |
+| activeFieldKeys | Array | `[]` | List of field types that should be visible in the component selector. If empty, all fields are shown. |
 | showComponentSelector | Boolean | `true` | Whether to show the component selector |
 | showFormSettings | Boolean | `true` | Whether to show form settings |
 | showFormName | Boolean | `true` | Whether to show form name input |
-| ... | ... | ... | Many more customization options |
+| exportFormats | Array | `[{ value: 'vue', label: 'Vue/Nuxt Component' }, { value: 'json', label: 'JSON (Importable)' }, { value: 'html', label: 'Embeddable HTML' }]` | Available export formats |
 
 ### FormPreview
 
@@ -163,7 +195,6 @@ app.mount('#app')
 | form | Object | Required | Form data to preview |
 | formId | String | `null` | ID to load form from store |
 | showHeader | Boolean | `true` | Whether to show the header |
-| ... | ... | ... | Many more customization options |
 
 ## Events
 
@@ -171,6 +202,7 @@ app.mount('#app')
 
 - `save`: Emitted when the form is saved
 - `export`: Emitted when the form code is exported
+- `get-form-code`: Emitted when the form code is requested without displaying the modal
 - `field-added`: Emitted when a field is added
 - `field-updated`: Emitted when a field is updated
 - `field-deleted`: Emitted when a field is deleted
@@ -182,6 +214,31 @@ app.mount('#app')
 - `validation-error`: Emitted when validation fails
 - `submit-success`: Emitted when submission succeeds
 - `submit-error`: Emitted when submission fails
+
+## Form Data Structure
+
+### Field Structure
+
+Each field in the form has the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| id | String | Unique identifier for the field (automatically generated) |
+| key | String | Key that identifies the field (automatically generated, but can be customized) |
+| type | String | Type of the field (e.g., 'text', 'textarea', 'select', etc.) |
+| label | String | Label for the field |
+| placeholder | String | Placeholder text for the field |
+| required | Boolean | Whether the field is required |
+| validation | Object | Validation rules for the field (e.g., min, max, pattern) |
+| options | Array | Options for select, radio, and checkbox fields |
+
+## Component Methods
+
+### FormBuilder Methods
+
+- `saveForm()`: Saves the form to the store and emits the 'save' event
+- `exportFormCode()`: Generates the form code based on the selected export format (Vue/Nuxt, JSON, or HTML), displays it in a modal, and emits the 'export' event
+- `getFormCode()`: Generates the Vue/Nuxt form code without displaying the modal, emits the 'get-form-code' event, and returns the code
 
 ## Development
 
