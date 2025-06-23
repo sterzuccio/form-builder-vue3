@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
-import FormBuilder from '@/lib/components/FormBuilder.vue'
-import { formBuilderStore } from '@/lib/store'
+import FormBuilder from '../../src/lib/components/FormBuilder.vue'
+import { formBuilderStore } from '../../src/lib/store'
 
 // Create a mock store
 const createMockStore = () => {

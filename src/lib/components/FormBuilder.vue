@@ -402,7 +402,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
-import NotificationModal from "@/lib/components/NotificationModal.vue";
+import NotificationModal from "./NotificationModal.vue";
 
 export default {
   name: 'FormBuilder',

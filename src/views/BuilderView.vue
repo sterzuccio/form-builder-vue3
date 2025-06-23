@@ -391,7 +391,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import NotificationModal from "@/lib/components/NotificationModal.vue";
+import NotificationModal from "../lib/components/NotificationModal.vue";
 
 export default {
   name: 'BuilderView',
