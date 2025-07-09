@@ -27,7 +27,7 @@
                 v-model="formData[getFieldId(field)]" 
                 :placeholder="field.placeholder" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -42,7 +42,7 @@
                 v-model="formData[getFieldId(field)]" 
                 :placeholder="field.placeholder" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               ></textarea>
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -60,7 +60,7 @@
                 :required="field.required"
                 :min="field.validation && field.validation.min"
                 :max="field.validation && field.validation.max"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -76,7 +76,7 @@
                 v-model="formData[getFieldId(field)]" 
                 :placeholder="field.placeholder" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -92,7 +92,7 @@
                 v-model="formData[getFieldId(field)]" 
                 :placeholder="field.placeholder" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -107,7 +107,7 @@
                 :id="getFieldId(field)" 
                 v-model="formData[getFieldId(field)]" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
               <p v-if="errors[getFieldId(field)]" class="mt-2 text-sm text-red-600">{{ errors[getFieldId(field)] }}</p>
             </div>
@@ -121,7 +121,7 @@
                 :id="getFieldId(field)" 
                 v-model="formData[getFieldId(field)]" 
                 :required="field.required"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
                 <option value="" disabled>{{ selectPlaceholderText }}</option>
                 <option 
@@ -153,7 +153,7 @@
                     :value="option.value" 
                     v-model="formData[getFieldId(field)]" 
                     :required="field.required"
-                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300`"
                   >
                   <label :for="`${getFieldId(field)}_${option.value}`" class="ml-3 block text-sm font-medium text-gray-700">
                     {{ option.label }}
@@ -180,7 +180,7 @@
                       :id="`${getFieldId(field)}_${option.value}`" 
                       :value="option.value" 
                       v-model="formData[getFieldId(field)]" 
-                      class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
                     >
                     <label :for="`${getFieldId(field)}_${option.value}`" class="ml-3 block text-sm font-medium text-gray-700">
                       {{ option.label }}
@@ -194,7 +194,7 @@
                   :id="getFieldId(field)" 
                   v-model="formData[getFieldId(field)]" 
                   :required="field.required"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
                 >
                 <label :for="getFieldId(field)" class="ml-3 block text-sm font-medium text-gray-700">
                   {{ field.label }}{{ field.required ? ' *' : '' }}
@@ -212,7 +212,7 @@
             <slot name="submit-button">
               <button 
                 type="submit" 
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
               >
                 {{ submitButtonText }}
               </button>
@@ -238,7 +238,7 @@
         <div class="mt-6 flex justify-end">
           <button 
             @click="closeResultModal" 
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
           >
             {{ closeButtonText }}
           </button>
@@ -249,7 +249,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
@@ -310,6 +310,21 @@ export default {
     storeModuleName: {
       type: String,
       default: 'formBuilder'
+    },
+    // Color customization
+    color: {
+      type: String,
+      default: 'indigo',
+      validator: (value) => {
+        // Common Tailwind colors
+        const validColors = [
+          'slate', 'gray', 'zinc', 'neutral', 'stone',
+          'red', 'orange', 'amber', 'yellow', 'lime', 'green',
+          'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo',
+          'violet', 'purple', 'fuchsia', 'pink', 'rose'
+        ]
+        return validColors.includes(value)
+      }
     }
   },
   emits: [
@@ -521,6 +536,32 @@ export default {
       showResultModal.value = false
     }
 
+    // Color computed properties
+    const colorClasses = computed(() => {
+      const color = props.color
+      return {
+        // Focus ring and border colors
+        focusRing: `focus:ring-${color}-500`,
+        focusBorder: `focus:border-${color}-500`,
+
+        // Text colors
+        text600: `text-${color}-600`,
+        text500: `text-${color}-500`,
+
+        // Background colors
+        bg600: `bg-${color}-600`,
+        bg700: `bg-${color}-700`,
+
+        // Hover background colors
+        hoverBg700: `hover:bg-${color}-700`,
+
+        // Ring colors for focus states
+        ringOffset: `focus:ring-offset-2`,
+        ring: `focus:ring-2`,
+        ringColor: `focus:ring-${color}-500`
+      }
+    })
+
     return {
       formData,
       errors,
@@ -529,7 +570,8 @@ export default {
       submissionError,
       getFieldId,
       submitForm,
-      closeResultModal
+      closeResultModal,
+      colorClasses
     }
   }
 }

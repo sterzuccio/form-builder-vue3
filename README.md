@@ -2,6 +2,8 @@
 
 A powerful form builder component library for Vue 3, featuring drag-and-drop form creation, validation, and customization.
 
+Repository git: [form-builder-vue3](https://github.com/sterzuccio/form-builder-vue3)
+
 ## Features
 
 - **Vue 3 Compatible**: Built using Vue 3 and the Composition API
@@ -14,6 +16,7 @@ A powerful form builder component library for Vue 3, featuring drag-and-drop for
 - **Endpoint Configuration**: Configure endpoints, HTTP methods, and custom headers
 - **Field Validation**: Support for required, min, max, and pattern validations
 - **Customizable Fields**: Customize labels, placeholders, required status, field width, and options for select/radio fields
+- **Color Customization**: Customize component colors using Tailwind CSS color palette (indigo by default)
 - **Comprehensive Tests**: Includes unit and integration tests for all components
 
 ## Available Field Types
@@ -58,22 +61,21 @@ app.mount('#app')
 ### Using Individual Components
 
 ```vue
+
 <template>
   <div>
     <h1>Form Builder</h1>
-    <FormBuilder 
-      ref="formBuilder"
-      :initial-form="myForm" 
-      @save="handleSave"
-      @export="handleExport"
-      @get-form-code="handleGetFormCode"
-    />
+    <FormBuilder
+        ref="formBuilder"
+        :initial-form="myForm"
+        @save="handleSave"
+        @export="handleExport"
+        @get-form-code="handleGetFormCode"></FormBuilder>
 
     <h1>Form Preview</h1>
-    <FormPreview 
-      :form="myForm" 
-      @submit="handleSubmit"
-    />
+    <FormPreview
+        :form="myForm"
+        @submit="handleSubmit"></FormPreview>
 
     <button @click="getAndSaveFormCode" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
       Get Form Code
@@ -82,70 +84,70 @@ app.mount('#app')
 </template>
 
 <script>
-import { ref } from 'vue'
-import { FormBuilder, FormPreview } from 'form-builder-vue3'
+  import {ref} from 'vue'
+  import {FormBuilder, FormPreview} from 'form-builder-vue3'
 
-export default {
-  components: {
-    FormBuilder,
-    FormPreview
-  },
-  setup() {
-    const formBuilder = ref(null)
-    const myForm = ref({
-      name: 'My Form',
-      fields: [],
-      endpoint: 'https://api.example.com/submit',
-      method: 'POST',
-      headers: {
-        'X-Custom-Header': 'value'
+  export default {
+    components: {
+      FormBuilder,
+      FormPreview
+    },
+    setup() {
+      const formBuilder = ref(null)
+      const myForm = ref({
+        name: 'My Form',
+        fields: [],
+        endpoint: 'https://api.example.com/submit',
+        method: 'POST',
+        headers: {
+          'X-Custom-Header': 'value'
+        }
+      })
+
+      const handleSave = (form) => {
+        console.log('Form saved:', form)
+        myForm.value = form
       }
-    })
 
-    const handleSave = (form) => {
-      console.log('Form saved:', form)
-      myForm.value = form
-    }
+      const handleExport = (code) => {
+        console.log('Exported code:', code)
+      }
 
-    const handleExport = (code) => {
-      console.log('Exported code:', code)
-    }
+      const handleGetFormCode = (code) => {
+        console.log('Got form code:', code)
+        // You can save the code wherever you want
+        saveCodeToCustomLocation(code)
+      }
 
-    const handleGetFormCode = (code) => {
-      console.log('Got form code:', code)
-      // You can save the code wherever you want
-      saveCodeToCustomLocation(code)
-    }
+      const getAndSaveFormCode = () => {
+        // Programmatically get the form code
+        const code = formBuilder.value.getFormCode()
+        console.log('Got form code programmatically:', code)
+        // You can save the code wherever you want
+        saveCodeToCustomLocation(code)
+      }
 
-    const getAndSaveFormCode = () => {
-      // Programmatically get the form code
-      const code = formBuilder.value.getFormCode()
-      console.log('Got form code programmatically:', code)
-      // You can save the code wherever you want
-      saveCodeToCustomLocation(code)
-    }
+      const saveCodeToCustomLocation = (code) => {
+        // Example function to save the code to a custom location
+        // This could be a file download, localStorage, or any other storage method
+        console.log('Saving code to custom location:', code)
+      }
 
-    const saveCodeToCustomLocation = (code) => {
-      // Example function to save the code to a custom location
-      // This could be a file download, localStorage, or any other storage method
-      console.log('Saving code to custom location:', code)
-    }
+      const handleSubmit = (data) => {
+        console.log('Form submitted with data:', data)
+      }
 
-    const handleSubmit = (data) => {
-      console.log('Form submitted with data:', data)
-    }
-
-    return {
-      formBuilder,
-      myForm,
-      handleSave,
-      handleExport,
-      handleGetFormCode,
-      getAndSaveFormCode,
-      handleSubmit
+      return {
+        formBuilder,
+        myForm,
+        handleSave,
+        handleExport,
+        handleGetFormCode,
+        getAndSaveFormCode,
+        handleSubmit
+      }
     }
   }
-}
 </script>
 ```
 
@@ -173,6 +175,58 @@ app.use(FormBuilderPlugin, {
 app.mount('#app')
 ```
 
+### Color Customization
+
+All components support color customization using the `color` prop. You can use any Tailwind CSS color name to theme the components:
+
+```vue
+
+<template>
+  <div>
+    <!-- Blue theme -->
+    <FormBuilder
+        :initial-form="myForm"
+        color="blue"
+        @save="handleSave"></FormBuilder>
+
+    <!-- Green theme -->
+    <FormPreview
+        :form="myForm"
+        color="green"
+        @submit="handleSubmit"></FormPreview>
+
+    <!-- Red theme -->
+    <FormBuilder
+        :initial-form="myForm"
+        color="red"
+        @save="handleSave"></FormBuilder>
+
+    <!-- Purple theme -->
+    <FormPreview
+        :form="myForm"
+        color="purple"
+        @submit="handleSubmit"></FormPreview>
+  </div>
+</template>
+```
+
+#### Available Colors
+
+The following Tailwind CSS colors are supported:
+- `slate`, `gray`, `zinc`, `neutral`, `stone`
+- `red`, `orange`, `amber`, `yellow`, `lime`, `green`
+- `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`
+- `violet`, `purple`, `fuchsia`, `pink`, `rose`
+
+The color affects:
+- Button backgrounds and hover states
+- Focus rings and borders
+- Radio button and checkbox colors
+- Form field focus states
+- All interactive elements
+
+**Note**: Make sure the chosen color classes are available in your Tailwind CSS build. The default color is `indigo`.
+
 ## Component Props
 
 ### FormBuilder
@@ -187,6 +241,7 @@ app.mount('#app')
 | showFormSettings | Boolean | `true` | Whether to show form settings |
 | showFormName | Boolean | `true` | Whether to show form name input |
 | exportFormats | Array | `[{ value: 'vue', label: 'Vue/Nuxt Component' }, { value: 'json', label: 'JSON (Importable)' }, { value: 'html', label: 'Embeddable HTML' }]` | Available export formats |
+| color | String | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) |
 
 ### FormPreview
 
@@ -195,6 +250,7 @@ app.mount('#app')
 | form | Object | Required | Form data to preview |
 | formId | String | `null` | ID to load form from store |
 | showHeader | Boolean | `true` | Whether to show the header |
+| color | String | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) |
 
 ## Events
 

@@ -42,3 +42,4 @@ PUBLISHING.md
 package-lock.json
 commit_message.txt
 release_notes.md
+git_release_notes.md
