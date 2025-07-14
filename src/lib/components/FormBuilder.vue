@@ -28,7 +28,7 @@
               type="text" 
               :id="formNameId" 
               v-model="currentForm.name" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               :placeholder="formNamePlaceholder"
             >
           </div>
@@ -44,7 +44,7 @@
               <div v-if="showExportButton" class="flex space-x-2">
                 <select 
                   v-model="selectedExportFormat"
-                  :class="`block border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                  :class="`block border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
                   <option v-for="format in exportFormats" :key="format.value" :value="format.value">
                     {{ format.label }}
@@ -132,7 +132,7 @@
               type="text" 
               id="endpoint" 
               v-model="currentForm.endpoint" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               :placeholder="endpointPlaceholder"
             >
           </div>
@@ -142,7 +142,7 @@
             <select 
               id="method" 
               v-model="currentForm.method" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
               <option v-for="method in httpMethods" :key="method" :value="method">{{ method }}</option>
             </select>
@@ -154,13 +154,13 @@
               <input 
                 type="text" 
                 v-model="headerKeys[key]" 
-                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 :placeholder="headerKeyPlaceholder"
               >
               <input 
                 type="text" 
                 v-model="headers[key]" 
-                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 :placeholder="headerValuePlaceholder"
               >
             </div>
@@ -187,7 +187,7 @@
               type="text" 
               id="field-label" 
               v-model="editingField.label" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
           </div>
 
@@ -197,7 +197,7 @@
               type="text" 
               id="field-key" 
               v-model="editingField.key" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm ${fieldErrors?.value?.key ? 'border-red-500' : ''}`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm ${fieldErrors?.value?.key ? 'border-red-500' : ''}`"
               @input="keyManuallyEdited = true"
               data-testid="field-key-input"
             >
@@ -210,7 +210,7 @@
               type="text" 
               id="field-placeholder" 
               v-model="editingField.placeholder" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
           </div>
 
@@ -262,7 +262,7 @@
                   type="number" 
                   id="field-min" 
                   v-model="editingField.validation.min" 
-                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
               <div>
@@ -271,7 +271,7 @@
                   type="number" 
                   id="field-max" 
                   v-model="editingField.validation.max" 
-                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
             </div>
@@ -283,7 +283,7 @@
                   type="number" 
                   id="field-min" 
                   v-model="editingField.validation.min" 
-                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
               <div>
@@ -292,7 +292,7 @@
                   type="number" 
                   id="field-max" 
                   v-model="editingField.validation.max" 
-                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
             </div>
@@ -303,7 +303,7 @@
                 type="text" 
                 id="field-pattern" 
                 v-model="editingField.validation.pattern" 
-                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
             </div>
           </div>
@@ -316,13 +316,13 @@
               <input 
                 type="text" 
                 v-model="option.value" 
-                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 :placeholder="optionValuePlaceholder"
               >
               <input 
                 type="text" 
                 v-model="option.label" 
-                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 :placeholder="optionLabelPlaceholder"
               >
               <button 
