@@ -275,4 +275,185 @@ describe('FormBuilder.vue', () => {
     expect(wrapper.vm.exportedCode).toContain('<html')
     expect(wrapper.emitted().export.length).toBe(3)
   })
+
+  describe('Color functionality', () => {
+    it('accepts standard Tailwind colors', () => {
+      const wrapper = mount(FormBuilder, {
+        props: {
+          color: 'blue'
+        },
+        global: {
+          plugins: [store]
+        }
+      })
+
+      // Check that colorClasses are generated correctly for standard colors
+      expect(wrapper.vm.colorClasses.focusRing).toBe('focus:ring-blue-500')
+      expect(wrapper.vm.colorClasses.focusBorder).toBe('focus:border-blue-500')
+      expect(wrapper.vm.colorClasses.text600).toBe('text-blue-600')
+      expect(wrapper.vm.colorClasses.bg600).toBe('bg-blue-600')
+      expect(wrapper.vm.colorClasses.hoverBg700).toBe('hover:bg-blue-700')
+    })
+
+    it('accepts custom color objects', () => {
+      const customColor = {
+        name: 'brand-purple',
+        colors: {
+          '50': '#faf5ff',
+          '100': '#f3e8ff',
+          '200': '#e9d5ff',
+          '300': '#d8b4fe',
+          '400': '#c084fc',
+          '500': '#a855f7',
+          '600': '#9333ea',
+          '700': '#7c3aed',
+          '800': '#6b21a8',
+          '900': '#581c87',
+          '950': '#3b0764'
+        }
+      }
+
+      const wrapper = mount(FormBuilder, {
+        props: {
+          color: customColor
+        },
+        global: {
+          plugins: [store]
+        }
+      })
+
+      // Check that colorClasses are generated correctly for custom colors
+      expect(wrapper.vm.colorClasses.focusRing).toBe('focus:ring-brand-purple-500')
+      expect(wrapper.vm.colorClasses.focusBorder).toBe('focus:border-brand-purple-500')
+      expect(wrapper.vm.colorClasses.text600).toBe('text-brand-purple-600')
+      expect(wrapper.vm.colorClasses.bg600).toBe('bg-brand-purple-600')
+      expect(wrapper.vm.colorClasses.hoverBg700).toBe('hover:bg-brand-purple-700')
+    })
+
+    it('validates custom color objects correctly', () => {
+      // Test invalid custom color - missing name
+      const invalidColor1 = {
+        colors: {
+          '50': '#faf5ff',
+          '500': '#a855f7'
+        }
+      }
+
+      // Test invalid custom color - missing required shades
+      const invalidColor2 = {
+        name: 'incomplete',
+        colors: {
+          '50': '#faf5ff',
+          '500': '#a855f7'
+        }
+      }
+
+      // Test invalid custom color - invalid hex format
+      const invalidColor3 = {
+        name: 'invalid-hex',
+        colors: {
+          '50': 'not-a-hex',
+          '100': '#f3e8ff',
+          '200': '#e9d5ff',
+          '300': '#d8b4fe',
+          '400': '#c084fc',
+          '500': '#a855f7',
+          '600': '#9333ea',
+          '700': '#7c3aed',
+          '800': '#6b21a8',
+          '900': '#581c87',
+          '950': '#3b0764'
+        }
+      }
+
+      // These should all fail validation and fall back to default
+      expect(() => {
+        mount(FormBuilder, {
+          props: { color: invalidColor1 },
+          global: { plugins: [store] }
+        })
+      }).not.toThrow() // Component should handle invalid props gracefully
+
+      expect(() => {
+        mount(FormBuilder, {
+          props: { color: invalidColor2 },
+          global: { plugins: [store] }
+        })
+      }).not.toThrow()
+
+      expect(() => {
+        mount(FormBuilder, {
+          props: { color: invalidColor3 },
+          global: { plugins: [store] }
+        })
+      }).not.toThrow()
+    })
+
+    it('validates standard color strings correctly', () => {
+      // Valid standard colors should work
+      const validColors = ['blue', 'red', 'green', 'indigo', 'purple']
+
+      validColors.forEach(color => {
+        expect(() => {
+          mount(FormBuilder, {
+            props: { color },
+            global: { plugins: [store] }
+          })
+        }).not.toThrow()
+      })
+
+      // Invalid standard colors should be handled gracefully
+      expect(() => {
+        mount(FormBuilder, {
+          props: { color: 'invalid-color' },
+          global: { plugins: [store] }
+        })
+      }).not.toThrow()
+    })
+
+    it('injects custom color styles into document', () => {
+      const customColor = {
+        name: 'test-color',
+        colors: {
+          '50': '#faf5ff',
+          '100': '#f3e8ff',
+          '200': '#e9d5ff',
+          '300': '#d8b4fe',
+          '400': '#c084fc',
+          '500': '#a855f7',
+          '600': '#9333ea',
+          '700': '#7c3aed',
+          '800': '#6b21a8',
+          '900': '#581c87',
+          '950': '#3b0764'
+        }
+      }
+
+      const wrapper = mount(FormBuilder, {
+        props: {
+          color: customColor
+        },
+        global: {
+          plugins: [store]
+        }
+      })
+
+      // Trigger the computed property to inject styles
+      const classes = wrapper.vm.colorClasses
+
+      // Check that a style element was created
+      const styleElement = document.getElementById('custom-color-test-color')
+      expect(styleElement).toBeTruthy()
+      expect(styleElement.tagName).toBe('STYLE')
+
+      // Check that the style contains expected CSS rules
+      const styleContent = styleElement.textContent
+      expect(styleContent).toContain('.text-test-color-500 { color: #a855f7 !important; }')
+      expect(styleContent).toContain('.bg-test-color-600 { background-color: #9333ea !important; }')
+      expect(styleContent).toContain('.focus\\:ring-test-color-500:focus { --tw-ring-color: #a855f7 !important; }')
+
+      // Clean up
+      styleElement.remove()
+    })
+  })
 })

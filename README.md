@@ -227,6 +227,10 @@ The color affects:
 
 **Note**: Make sure the chosen color classes are available in your Tailwind CSS build. The default color is `indigo`.
 
+#### Custom Colors
+
+In addition to standard Tailwind colors, you can also define custom colors with all the standard Tailwind color shades (50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950). For detailed information on how to use custom colors, see the [Custom Colors Documentation](documentation/CUSTOM_COLORS.md).
+
 ## Component Props
 
 ### FormBuilder
@@ -241,7 +245,7 @@ The color affects:
 | showFormSettings | Boolean | `true` | Whether to show form settings |
 | showFormName | Boolean | `true` | Whether to show form name input |
 | exportFormats | Array | `[{ value: 'vue', label: 'Vue/Nuxt Component' }, { value: 'json', label: 'JSON (Importable)' }, { value: 'html', label: 'Embeddable HTML' }]` | Available export formats |
-| color | String | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) |
+| color | String \| Object | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) or a custom color object with all required shades. See [Custom Colors Documentation](documentation/CUSTOM_COLORS.md) for object format. |
 
 ### FormPreview
 
@@ -250,7 +254,7 @@ The color affects:
 | form | Object | Required | Form data to preview |
 | formId | String | `null` | ID to load form from store |
 | showHeader | Boolean | `true` | Whether to show the header |
-| color | String | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) |
+| color | String \| Object | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) or a custom color object with all required shades. See [Custom Colors Documentation](documentation/CUSTOM_COLORS.md) for object format. |
 
 ## Events
 

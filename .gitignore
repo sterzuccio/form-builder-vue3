@@ -38,8 +38,8 @@ Thumbs.db
 # Build files
 /build
 
-PUBLISHING.md
+documentation/PUBLISHING.md
 package-lock.json
 commit_message.txt
-release_notes.md
-git_release_notes.md
+documentation/release_notes.md
+documentation/git_release_notes.md

@@ -54,10 +54,21 @@ module.exports = {
     'hover:bg-red-700', 'hover:bg-orange-700', 'hover:bg-amber-700', 'hover:bg-yellow-700', 'hover:bg-lime-700',
     'hover:bg-green-700', 'hover:bg-emerald-700', 'hover:bg-teal-700', 'hover:bg-cyan-700', 'hover:bg-sky-700',
     'hover:bg-blue-700', 'hover:bg-indigo-700', 'hover:bg-violet-700', 'hover:bg-purple-700', 'hover:bg-fuchsia-700',
-    'hover:bg-pink-700', 'hover:bg-rose-700'
+    'hover:bg-pink-700', 'hover:bg-rose-700',
+
+    // Patterns for custom colors - these will match dynamically generated custom color classes
+    {
+      pattern: /^(text|bg|border)-([\w-]+)-(50|100|200|300|400|500|600|700|800|900|950)$/,
+    },
+    {
+      pattern: /^(focus|hover):(ring|border|bg|text)-([\w-]+)-(50|100|200|300|400|500|600|700|800|900|950)$/,
+    }
   ],
   theme: {
-    extend: {},
+    extend: {
+      // Custom colors will be dynamically added here by the FormBuilder component
+      colors: {}
+    },
   },
   plugins: [],
 }
