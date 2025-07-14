@@ -178,7 +178,7 @@
               type="text" 
               id="field-label" 
               v-model="editingField.label" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
           </div>
 
@@ -188,11 +188,10 @@
               type="text" 
               id="field-key" 
               v-model="editingField.key" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              :class="{ 'border-red-500': fieldErrors.value.key }"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm ${fieldErrors?.value?.key ? 'border-red-500' : ''}`"
               @input="keyManuallyEdited = true"
             >
-            <p v-if="fieldErrors.value.key" class="mt-1 text-sm text-red-600">{{ fieldErrors.value.key }}</p>
+            <p v-if="fieldErrors?.value?.key" class="mt-1 text-sm text-red-600">{{ fieldErrors?.value?.key }}</p>
           </div>
 
           <div>
@@ -201,7 +200,7 @@
               type="text" 
               id="field-placeholder" 
               v-model="editingField.placeholder" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
           </div>
 
@@ -210,7 +209,7 @@
               type="checkbox" 
               id="field-required" 
               v-model="editingField.required" 
-              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
             >
             <label for="field-required" class="ml-2 block text-sm text-gray-900">Required</label>
           </div>
@@ -225,7 +224,7 @@
                   id="field-width-full" 
                   v-model="editingField.width" 
                   value="full" 
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300`"
                 >
                 <label for="field-width-full" class="ml-2 block text-sm text-gray-900">Full Width</label>
               </div>
@@ -235,7 +234,7 @@
                   id="field-width-half" 
                   v-model="editingField.width" 
                   value="half" 
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300`"
                 >
                 <label for="field-width-half" class="ml-2 block text-sm text-gray-900">Half Width</label>
               </div>
@@ -362,13 +361,13 @@
         <div class="flex justify-end">
           <button 
             @click="copyCode" 
-            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3"
+            :class="`inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor} mr-3`"
           >
             Copy to Clipboard
           </button>
           <button 
             @click="closeExportModal" 
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
           >
             Close
           </button>
@@ -383,6 +382,7 @@
       :message="notificationMessage"
       :button-text="notificationButtonText"
       :timeout="notificationTimeout"
+      :color="color"
     />
   </div>
 </template>
@@ -396,7 +396,24 @@ import NotificationModal from "../lib/components/NotificationModal.vue";
 export default {
   name: 'BuilderView',
   components: {NotificationModal},
-  setup() {
+  props: {
+    // Color customization
+    color: {
+      type: String,
+      default: 'indigo',
+      validator: (value) => {
+        // Common Tailwind colors
+        const validColors = [
+          'slate', 'gray', 'zinc', 'neutral', 'stone',
+          'red', 'orange', 'amber', 'yellow', 'lime', 'green',
+          'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo',
+          'violet', 'purple', 'fuchsia', 'pink', 'rose'
+        ]
+        return validColors.includes(value)
+      }
+    }
+  },
+  setup(props) {
     const store = useStore()
     const router = useRouter()
     const route = useRoute()
@@ -926,6 +943,32 @@ export default {
         })
     }
 
+    // Color computed properties
+    const colorClasses = computed(() => {
+      const color = props.color
+      return {
+        // Focus ring and border colors
+        focusRing: `focus:ring-${color}-500`,
+        focusBorder: `focus:border-${color}-500`,
+
+        // Text colors
+        text600: `text-${color}-600`,
+        text500: `text-${color}-500`,
+
+        // Background colors
+        bg600: `bg-${color}-600`,
+        bg700: `bg-${color}-700`,
+
+        // Hover background colors
+        hoverBg700: `hover:bg-${color}-700`,
+
+        // Ring colors for focus states
+        ringOffset: `focus:ring-offset-2`,
+        ring: `focus:ring-2`,
+        ringColor: `focus:ring-${color}-500`
+      }
+    })
+
     return {
       currentForm,
       availableComponents,
@@ -956,7 +999,8 @@ export default {
       saveForm,
       exportFormCode,
       closeExportModal,
-      copyCode
+      copyCode,
+      colorClasses
     }
   }
 }
