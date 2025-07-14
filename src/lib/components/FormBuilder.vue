@@ -103,6 +103,8 @@
                     <div v-if="field.label">Label: {{ field.label }}</div>
                     <div v-if="field.placeholder">Placeholder: {{ field.placeholder }}</div>
                     <div>Required: {{ field.required ? 'Yes' : 'No' }}</div>
+                    <div>Hidden: {{ field.hidden ? 'Yes' : 'No' }}</div>
+                    <div v-if="field.hidden && field.defaultValue">Default Value: "{{ field.defaultValue }}"</div>
                     <div>Width: {{ field.width === 'half' ? fieldWidthHalfText : fieldWidthFullText }}</div>
                     <div v-if="field.validation">
                       Validation: 
@@ -222,6 +224,29 @@
               :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
             >
             <label for="field-required" class="ml-2 block text-sm text-gray-900">{{ fieldRequiredText }}</label>
+          </div>
+
+          <div class="flex items-center">
+            <input 
+              type="checkbox" 
+              id="field-hidden" 
+              v-model="editingField.hidden" 
+              :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
+            >
+            <label for="field-hidden" class="ml-2 block text-sm text-gray-900">Hidden (field will be present but not visible to users)</label>
+          </div>
+
+          <!-- Default Value for Hidden Fields -->
+          <div v-if="editingField.hidden">
+            <label for="field-default-value" class="block text-sm font-medium text-gray-700">Default Value</label>
+            <input 
+              type="text" 
+              id="field-default-value" 
+              v-model="editingField.defaultValue" 
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              placeholder="Enter default value for this hidden field"
+            >
+            <p class="mt-1 text-sm text-gray-500">This value will be used when the form is submitted</p>
           </div>
 
           <!-- Field Width Selection -->
@@ -935,7 +960,9 @@ export default {
         placeholder: '',
         required: false,
         validation: {},
-        width: 'full' // Default width: full or half
+        width: 'full', // Default width: full or half
+        hidden: false, // Default hidden: false
+        defaultValue: '' // Default value for hidden fields
       }
 
       if (['select', 'radio', 'checkbox'].includes(type)) {
@@ -961,6 +988,16 @@ export default {
       // Ensure validation object exists
       if (!editingField.value.validation) {
         editingField.value.validation = {}
+      }
+
+      // Ensure hidden property exists (for backward compatibility)
+      if (editingField.value.hidden === undefined) {
+        editingField.value.hidden = false
+      }
+
+      // Ensure defaultValue property exists (for backward compatibility)
+      if (editingField.value.defaultValue === undefined) {
+        editingField.value.defaultValue = ''
       }
 
       // Reset the key manually edited flag

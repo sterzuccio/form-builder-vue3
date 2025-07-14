@@ -223,7 +223,3 @@ To migrate from standard colors to custom colors:
 2. Create a custom color object with your chosen shades
 3. Replace the string color prop with your custom color object
 4. Test thoroughly to ensure all UI elements display correctly
-
-## Testing
-
-A test file (`test_custom_colors.html`) is included in the project root that demonstrates both standard and custom color usage. Open this file in a browser to see the custom colors in action.

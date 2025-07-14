@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Hidden Fields</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="app" class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Test Hidden Fields Functionality</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Test Form with Hidden Field -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Test Form (Normal Mode)</h2>
+                <p class="text-sm text-gray-600 mb-4">Hidden fields should not be visible</p>
+                
+                <form class="space-y-4">
+                    <div v-for="field in testForm.fields" :key="field.id" 
+                         v-show="!field.hidden"
+                         class="form-field">
+                        <label class="block text-sm font-medium text-gray-700">
+                            {{ field.label }}{{ field.required ? ' *' : '' }}
+                        </label>
+                        <input 
+                            type="text" 
+                            :placeholder="field.placeholder"
+                            :required="field.required"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Test Form in Preview Mode -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Test Form (Preview Mode)</h2>
+                <p class="text-sm text-gray-600 mb-4">Hidden fields should be visible but disabled with "HIDDEN" badge</p>
+                
+                <form class="space-y-4">
+                    <div v-for="field in testForm.fields" :key="field.id" 
+                         :class="[
+                           'form-field relative',
+                           field.hidden ? 'opacity-50 pointer-events-none' : ''
+                         ]">
+                        <!-- Hidden field indicator -->
+                        <div v-if="field.hidden" class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl-md z-10">
+                            HIDDEN
+                        </div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            {{ field.label }}{{ field.required ? ' *' : '' }}
+                        </label>
+                        <input 
+                            type="text" 
+                            :placeholder="field.placeholder"
+                            :required="field.required"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Field Status Display -->
+        <div class="mt-8 bg-gray-100 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4">Field Status</h3>
+            <div v-for="field in testForm.fields" :key="field.id" class="mb-2">
+                <span class="font-medium">{{ field.label }}:</span>
+                <span :class="field.hidden ? 'text-red-600' : 'text-green-600'">
+                    {{ field.hidden ? 'Hidden' : 'Visible' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+
+        createApp({
+            setup() {
+                const testForm = ref({
+                    name: 'Test Form with Hidden Fields',
+                    fields: [
+                        {
+                            id: '1',
+                            type: 'text',
+                            label: 'Visible Field 1',
+                            placeholder: 'This field is visible',
+                            required: true,
+                            hidden: false
+                        },
+                        {
+                            id: '2',
+                            type: 'text',
+                            label: 'Hidden Field',
+                            placeholder: 'This field is hidden',
+                            required: false,
+                            hidden: true
+                        },
+                        {
+                            id: '3',
+                            type: 'text',
+                            label: 'Visible Field 2',
+                            placeholder: 'This field is also visible',
+                            required: false,
+                            hidden: false
+                        }
+                    ]
+                });
+
+                return {
+                    testForm
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

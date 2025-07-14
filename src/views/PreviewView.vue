@@ -26,9 +26,14 @@
               :key="index" 
               :class="[
                 'form-field',
-                field.width === 'half' ? 'col-span-1' : 'col-span-2'
+                field.width === 'half' ? 'col-span-1' : 'col-span-2',
+                field.hidden ? 'opacity-50 pointer-events-none relative' : ''
               ]"
             >
+            <!-- Hidden field indicator for preview mode -->
+            <div v-if="field.hidden" class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl-md z-10">
+              HIDDEN
+            </div>
             <!-- Text Input -->
             <div v-if="field.type === 'text'" class="form-group">
               <label :for="getFieldId(field)" class="block text-sm font-medium text-gray-700">
@@ -293,6 +298,12 @@ export default {
       // Initialize form data with default values
       currentForm.value.fields.forEach(field => {
         const fieldId = getFieldId(field)
+
+        // If field is hidden and has a default value, use it
+        if (field.hidden && field.defaultValue !== undefined && field.defaultValue !== '') {
+          formData[fieldId] = field.defaultValue
+          return
+        }
 
         switch (field.type) {
           case 'checkbox':

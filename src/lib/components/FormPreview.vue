@@ -15,7 +15,16 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <form @submit.prevent="submitForm" class="space-y-6">
-          <div v-for="(field, index) in form.fields" :key="index" class="form-field">
+          <div v-for="(field, index) in form.fields" :key="index" 
+               v-show="!field.hidden || previewMode"
+               :class="[
+                 'form-field',
+                 field.hidden && previewMode ? 'opacity-50 pointer-events-none relative' : ''
+               ]">
+            <!-- Hidden field indicator for preview mode -->
+            <div v-if="field.hidden && previewMode" class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl-md z-10">
+              HIDDEN
+            </div>
             <!-- Text Input -->
             <div v-if="field.type === 'text'" class="form-group">
               <label :for="getFieldId(field)" class="block text-sm font-medium text-gray-700">
@@ -306,6 +315,11 @@ export default {
       type: String,
       default: 'Close'
     },
+    // Preview mode - when true, hidden fields are shown as disabled
+    previewMode: {
+      type: Boolean,
+      default: false
+    },
     // Store configuration
     storeModuleName: {
       type: String,
@@ -391,6 +405,12 @@ export default {
       // Initialize form data with default values
       form.fields.forEach(field => {
         const fieldId = getFieldId(field)
+
+        // If field is hidden and has a default value, use it
+        if (field.hidden && field.defaultValue !== undefined && field.defaultValue !== '') {
+          formData[fieldId] = field.defaultValue
+          return
+        }
 
         switch (field.type) {
           case 'checkbox':
