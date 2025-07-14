@@ -221,9 +221,10 @@
               type="checkbox" 
               id="field-required" 
               v-model="editingField.required" 
-              :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded`"
+              :disabled="editingField.hidden"
+              :class="`h-4 w-4 ${colorClasses.text600} ${colorClasses.focusRing} border-gray-300 rounded ${editingField.hidden ? 'opacity-50 cursor-not-allowed' : ''}`"
             >
-            <label for="field-required" class="ml-2 block text-sm text-gray-900">{{ fieldRequiredText }}</label>
+            <label for="field-required" :class="`ml-2 block text-sm text-gray-900 ${editingField.hidden ? 'opacity-50' : ''}`">{{ fieldRequiredText }}</label>
           </div>
 
           <div class="flex items-center">
@@ -238,15 +239,17 @@
 
           <!-- Default Value for Hidden Fields -->
           <div v-if="editingField.hidden">
-            <label for="field-default-value" class="block text-sm font-medium text-gray-700">Default Value</label>
+            <label for="field-default-value" class="block text-sm font-medium text-gray-700">Default Value *</label>
             <input 
               type="text" 
               id="field-default-value" 
               v-model="editingField.defaultValue" 
-              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+              required
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm ${fieldErrors?.value?.defaultValue ? 'border-red-500' : ''}`"
               placeholder="Enter default value for this hidden field"
             >
-            <p class="mt-1 text-sm text-gray-500">This value will be used when the form is submitted</p>
+            <p v-if="fieldErrors?.value?.defaultValue" class="mt-1 text-sm text-red-600">{{ fieldErrors?.value?.defaultValue }}</p>
+            <p class="mt-1 text-sm text-gray-500">This value is required and will be used when the form is submitted</p>
           </div>
 
           <!-- Field Width Selection -->
@@ -1026,6 +1029,17 @@ export default {
         return
       }
 
+      // Check if field is hidden and default value is empty
+      if (editingField.value.hidden && (!editingField.value.defaultValue || editingField.value.defaultValue.trim() === '')) {
+        fieldErrors.value.defaultValue = 'Default value is required for hidden fields'
+        return
+      }
+
+      // If field is hidden, ensure required is false
+      if (editingField.value.hidden) {
+        editingField.value.required = false
+      }
+
       // If no errors, save the field
       currentForm.value.fields.splice(editingFieldIndex.value, 1, editingField.value)
       emit('field-updated', { index: editingFieldIndex.value, field: editingField.value })
@@ -1048,6 +1062,13 @@ export default {
         // Generate key from label: convert to lowercase and remove spaces
         const generatedKey = newLabel.toLowerCase().replace(/\s+/g, '')
         editingField.value.key = generatedKey
+      }
+    })
+
+    // Watch for hidden changes to automatically set required to false
+    watch(() => editingField.value.hidden, (isHidden) => {
+      if (isHidden) {
+        editingField.value.required = false
       }
     })
 
