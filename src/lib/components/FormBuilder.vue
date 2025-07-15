@@ -413,6 +413,32 @@
       </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirmModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">{{ deleteConfirmTitle }}</h3>
+
+        <div class="mb-6">
+          <p class="text-gray-700">{{ deleteConfirmMessage }}</p>
+        </div>
+
+        <div class="flex justify-end space-x-3">
+          <button 
+            @click="cancelDeleteField" 
+            :class="`inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
+          >
+            {{ cancelButtonText }}
+          </button>
+          <button 
+            @click="confirmDeleteField" 
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
+          >
+            {{ deleteButtonText }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Notification Modal -->
     <NotificationModal
       v-model="showNotification"
@@ -420,7 +446,6 @@
       :message="notificationMessage"
       :button-text="notificationButtonText"
       :timeout="notificationTimeout"
-      :color="color"
     />
   </div>
 </template>
@@ -646,6 +671,18 @@ export default {
     closeButtonText: {
       type: String,
       default: 'Close'
+    },
+    deleteConfirmTitle: {
+      type: String,
+      default: 'Confirm Delete'
+    },
+    deleteConfirmMessage: {
+      type: String,
+      default: 'Are you sure you want to delete this field? This action cannot be undone.'
+    },
+    deleteButtonText: {
+      type: String,
+      default: 'Delete'
     },
     // Other configuration
     httpMethods: {
@@ -916,6 +953,10 @@ export default {
     const notificationButtonText = ref('OK')
     const notificationTimeout = ref(3000) // Auto-close after 3 seconds
 
+    // Delete confirmation modal
+    const showDeleteConfirmModal = ref(false)
+    const pendingDeleteIndex = ref(-1)
+
     onMounted(() => {
       // Initialize headers
       Object.keys(currentForm.value.headers || {}).forEach(key => {
@@ -1073,11 +1114,23 @@ export default {
     })
 
     const deleteField = (index) => {
-      if (confirm('Are you sure you want to delete this field?')) {
-        currentForm.value.fields.splice(index, 1)
-        emit('field-deleted', index)
+      pendingDeleteIndex.value = index
+      showDeleteConfirmModal.value = true
+    }
+
+    const confirmDeleteField = () => {
+      if (pendingDeleteIndex.value >= 0) {
+        currentForm.value.fields.splice(pendingDeleteIndex.value, 1)
+        emit('field-deleted', pendingDeleteIndex.value)
         emit('form-updated', currentForm.value)
       }
+      showDeleteConfirmModal.value = false
+      pendingDeleteIndex.value = -1
+    }
+
+    const cancelDeleteField = () => {
+      showDeleteConfirmModal.value = false
+      pendingDeleteIndex.value = -1
     }
 
     // Options management for select, radio, checkbox
@@ -1722,6 +1775,8 @@ export default {
       notificationMessage,
       notificationButtonText,
       notificationTimeout,
+      showDeleteConfirmModal,
+      pendingDeleteIndex,
       onDragStart,
       onDrop,
       getComponentLabel,
@@ -1729,6 +1784,8 @@ export default {
       saveField,
       closeFieldModal,
       deleteField,
+      confirmDeleteField,
+      cancelDeleteField,
       addOption,
       removeOption,
       addHeader,
