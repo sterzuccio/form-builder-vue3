@@ -478,15 +478,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import NotificationModal from "./NotificationModal.vue";
-import {FormBuilder as currentForm} from "@/lib/simplified-index";
 
 export default {
   name: 'FormBuilder',
-  computed: {
-    currentForm() {
-      return currentForm
-    }
-  },
   components: {NotificationModal},
   props: {
     // Form data
