@@ -319,57 +319,58 @@ For detailed usage examples and advanced configurations, see the [Required Compo
 
 ## JavaScript Export Feature
 
-The FormBuilder now supports exporting forms as JavaScript code that can be embedded directly in HTML pages. This feature generates a self-contained script that can be inserted into the `<head>` section of any HTML page to dynamically load and render forms.
+The FormBuilder now supports exporting forms as JavaScript code that works just like Google Analytics - simple script tags that load forms dynamically from your server. This approach makes form integration as easy as adding Google Analytics to your website.
 
 ### Key Features
 
-- **Self-contained**: Generated JavaScript includes all necessary CSS and functionality
-- **Dynamic loading**: Forms can be loaded from external endpoints or embedded directly
-- **Automatic styling**: Includes responsive CSS styling that works without external dependencies
-- **Form validation**: Built-in client-side validation for required fields
-- **Flexible integration**: Can be loaded into any HTML container element
-- **Backend integration**: Supports dynamic form loading from server endpoints
+- **Google Analytics Style**: Simple script tags just like gtag.js
+- **Dynamic Loading**: Forms are loaded from your backend endpoint
+- **Lightweight**: No large embedded JavaScript code in HTML
+- **Cacheable**: Form JavaScript can be cached by browsers
+- **Easy Updates**: Update forms on server without changing HTML
+- **Familiar Pattern**: Developers already know this integration pattern
 
 ### Basic Usage
 
 1. **Export JavaScript Code**: Select "JavaScript (Head Script)" from the export format dropdown in FormBuilder
-2. **Configure Endpoint** (Optional): Set a form endpoint URL in the JavaScript Configuration section to load forms dynamically
-3. **Embed in HTML**: Add the generated script to your HTML page's `<head>` section
-4. **Add Container**: Include a container element where the form should appear
+2. **Configure Endpoint**: Set your form endpoint URL in the JavaScript Configuration section
+3. **Embed Script Tags**: Add the generated script tags to your HTML page's `<head>` section
+4. **Add Container**: Include a container div where the form should appear
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Your generated JavaScript code goes here -->
+    <!-- Form Builder Script (Google Analytics style) -->
+    <script async src="https://your-domain.com/api/forms/contact-form.js"></script>
     <script>
-        // Generated FormBuilder JavaScript code
+      window.formConfig = window.formConfig || {};
+      window.formConfig['contact-form'] = {
+        containerId: 'form-contact-form',
+        formId: 'contact-form'
+      };
     </script>
 </head>
 <body>
-    <!-- Form will be automatically loaded into this container -->
-    <div id="dynamic-form-container"></div>
-
-    <!-- Or load into a custom container -->
-    <div id="my-custom-form"></div>
-    <script>
-        // Load form into custom container
-        FormLoader.load('my-custom-form');
-    </script>
+    <h1>Contact Us</h1>
+    <!-- Form will be loaded here -->
+    <div id="form-contact-form"></div>
 </body>
 </html>
 ```
 
-### Backend Integration
+### Backend Requirements
 
-The JavaScript export feature supports loading form configurations dynamically from backend endpoints. This allows you to:
+Your backend endpoint `https://your-domain.com/api/forms/{formId}.js` should return JavaScript that creates and embeds the form. The endpoint receives the form ID and returns the appropriate JavaScript code to render that specific form.
 
-- Store form configurations on your server
-- Update forms without regenerating JavaScript code
-- Implement form versioning and management
-- Use custom headers for authentication
+### Comparison with Google Analytics
 
-For detailed implementation guidance, see the [JavaScript Export Documentation](documentation/JAVASCRIPT_EXPORT.md).
+| Google Analytics | Form Builder |
+|------------------|--------------|
+| `<script async src="https://www.googletagmanager.com/gtag/js?id=TAG_ID"></script>` | `<script async src="https://your-domain.com/api/forms/form-id.js"></script>` |
+| `gtag('config', 'TAG_ID');` | `window.formConfig['form-id'] = { containerId: 'form-form-id' };` |
+
+For detailed implementation guidance and backend examples, see the [JavaScript Export Documentation](documentation/JAVASCRIPT_EXPORT.md).
 
 ## Component Props
 

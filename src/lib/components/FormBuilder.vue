@@ -421,7 +421,7 @@
         <div class="flex justify-end">
           <button 
             @click="copyCode" 
-            :class="`inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor} mr-3`"
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor} mr-3`"
           >
             {{ copyButtonText }}
           </button>
@@ -478,9 +478,15 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import NotificationModal from "./NotificationModal.vue";
+import {FormBuilder as currentForm} from "@/lib/simplified-index";
 
 export default {
   name: 'FormBuilder',
+  computed: {
+    currentForm() {
+      return currentForm
+    }
+  },
   components: {NotificationModal},
   props: {
     // Form data
@@ -1537,396 +1543,62 @@ export default {
 <\/html>`
     }
 
-    // Generate JavaScript code for HTML head insertion
+    // Generate JavaScript code for HTML head insertion (Google Analytics style)
     const generateJsCode = () => {
-      const formConfig = {
-        name: currentForm.value.name || 'Generated Form',
-        endpoint: currentForm.value.endpoint || '',
-        method: currentForm.value.method || 'POST',
-        headers: currentForm.value.headers || {},
-        fields: allFields.value,
-        jsEndpoint: jsEndpointUrl.value || ''
-      }
+      // Generate a unique form ID if not provided
+      const formId = currentForm.value.id || `form_${Date.now()}`
 
-      return `(function() {
-  'use strict';
+      // Get the configured endpoint URL or use a default
+      const endpointUrl = jsEndpointUrl.value || 'https://your-domain.com/api/forms'
 
-  // Form configuration - can be loaded from endpoint if jsEndpoint is provided
-  let formConfig = ${JSON.stringify(formConfig, null, 2)};
-
-  // CSS styles for the form
-  const formStyles = \`
-    .dynamic-form {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.5;
-      color: #333;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-    .dynamic-form .form-group {
-      margin-bottom: 1rem;
-    }
-    .dynamic-form .form-group-half {
-      width: 48%;
-      display: inline-block;
-      vertical-align: top;
-      margin-right: 2%;
-    }
-    .dynamic-form .form-group-full {
-      width: 100%;
-      clear: both;
-    }
-    .dynamic-form label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    .dynamic-form input, .dynamic-form select, .dynamic-form textarea {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    .dynamic-form input[type="checkbox"], .dynamic-form input[type="radio"] {
-      width: auto;
-      margin-right: 0.5rem;
-    }
-    .dynamic-form .checkbox-label, .dynamic-form .radio-label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    .dynamic-form button {
-      background-color: #4f46e5;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .dynamic-form button:hover {
-      background-color: #4338ca;
-    }
-    .dynamic-form .error {
-      color: #dc2626;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-    .dynamic-form .success {
-      color: #059669;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-  \`;
-
-  // Inject CSS styles
-  function injectStyles() {
-    if (!document.getElementById('dynamic-form-styles')) {
-      const styleElement = document.createElement('style');
-      styleElement.id = 'dynamic-form-styles';
-      styleElement.textContent = formStyles;
-      document.head.appendChild(styleElement);
-    }
-  }
-
-  // Generate field HTML
-  function generateFieldHTML(field) {
-    const fieldName = field.key || field.name || field.type + field.label.replace(/\\s+/g, '');
-    const requiredAttr = field.required ? ' required' : '';
-    const errorDiv = \`<div id="\${fieldName}-error" class="error"></div>\`;
-    const widthClass = field.width === 'half' ? 'form-group-half' : 'form-group-full';
-
-    switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'password':
-      case 'number':
-      case 'date':
-        return \`<div class="form-group \${widthClass}">
-          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
-          <input 
-            type="\${field.type}" 
-            id="\${fieldName}" 
-            name="\${fieldName}"
-            placeholder="\${field.placeholder || ''}"
-            \${requiredAttr}
-          >
-          \${errorDiv}
-        </div>\`;
-
-      case 'textarea':
-        return \`<div class="form-group \${widthClass}">
-          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
-          <textarea 
-            id="\${fieldName}" 
-            name="\${fieldName}"
-            placeholder="\${field.placeholder || ''}"
-            \${requiredAttr}
-          ></textarea>
-          \${errorDiv}
-        </div>\`;
-
-      case 'select':
-        const selectOptions = field.options ? field.options.map(option => 
-          \`<option value="\${option.value}">\${option.label}</option>\`
-        ).join('') : '';
-        return \`<div class="form-group \${widthClass}">
-          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
-          <select 
-            id="\${fieldName}" 
-            name="\${fieldName}"
-            \${requiredAttr}
-          >
-            <option value="" disabled selected>Select an option</option>
-            \${selectOptions}
-          </select>
-          \${errorDiv}
-        </div>\`;
-
-      case 'radio':
-        const radioOptions = field.options ? field.options.map((option, index) => \`
-          <div class="radio-label">
-            <input 
-              type="radio" 
-              id="\${fieldName}_\${index}" 
-              name="\${fieldName}" 
-              value="\${option.value}"
-              \${index === 0 && field.required ? requiredAttr : ''}
-            >
-            <label for="\${fieldName}_\${index}">\${option.label}</label>
-          </div>\`).join('') : '';
-        return \`<div class="form-group \${widthClass}">
-          <label>\${field.label}\${field.required ? ' *' : ''}</label>
-          \${radioOptions}
-          \${errorDiv}
-        </div>\`;
-
-      case 'checkbox':
-        if (field.options && field.options.length > 1) {
-          const checkboxOptions = field.options.map((option, index) => \`
-            <div class="checkbox-label">
-              <input 
-                type="checkbox" 
-                id="\${fieldName}_\${index}" 
-                name="\${fieldName}[]" 
-                value="\${option.value}"
-              >
-              <label for="\${fieldName}_\${index}">\${option.label}</label>
-            </div>\`).join('');
-          return \`<div class="form-group \${widthClass}">
-            <label>\${field.label}\${field.required ? ' *' : ''}</label>
-            \${checkboxOptions}
-            \${errorDiv}
-          </div>\`;
-        } else {
-          return \`<div class="form-group checkbox-label \${widthClass}">
-            <input 
-              type="checkbox" 
-              id="\${fieldName}" 
-              name="\${fieldName}"
-              \${requiredAttr}
-            >
-            <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
-            \${errorDiv}
-          </div>\`;
-        }
-
-      default:
-        return \`<div class="form-group \${widthClass}">
-          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
-          <input 
-            type="text" 
-            id="\${fieldName}" 
-            name="\${fieldName}"
-            placeholder="\${field.placeholder || ''}"
-            \${requiredAttr}
-          >
-          \${errorDiv}
-        </div>\`;
-    }
-  }
-
-  // Create form HTML
-  function createFormHTML() {
-    const fieldsHTML = formConfig.fields.map(field => generateFieldHTML(field)).join('');
-
-    return \`
-      <div class="dynamic-form">
-        <form id="dynamicForm" method="\${formConfig.method}">
-          <h2>\${formConfig.name}</h2>
-          \${fieldsHTML}
-          <div class="form-group">
-            <button type="submit">Submit</button>
-          </div>
-          <div id="form-message"></div>
-        </form>
-      </div>
-    \`;
-  }
-
-  // Form validation
-  function validateForm(form) {
-    let isValid = true;
-    const requiredFields = form.querySelectorAll('[required]');
-
-    // Clear previous errors
-    form.querySelectorAll('.error').forEach(error => error.textContent = '');
-
-    requiredFields.forEach(field => {
-      const errorElement = document.getElementById(field.id + '-error');
-      if (!field.value.trim()) {
-        isValid = false;
-        if (errorElement) {
-          errorElement.textContent = 'This field is required';
-        }
-      }
-    });
-
-    return isValid;
-  }
-
-  // Submit form
-  function submitForm(formData) {
-    const messageDiv = document.getElementById('form-message');
-
-    if (!formConfig.endpoint) {
-      messageDiv.innerHTML = '<div class="error">No endpoint configured for form submission</div>';
-      return;
-    }
-
-    messageDiv.innerHTML = '<div style="color: #6b7280;">Submitting...</div>';
-
-    fetch(formConfig.endpoint, {
-      method: formConfig.method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...formConfig.headers
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => {
-      if (response.ok) {
-        messageDiv.innerHTML = '<div class="success">Form submitted successfully!</div>';
-        document.getElementById('dynamicForm').reset();
-      } else {
-        throw new Error('Form submission failed');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      messageDiv.innerHTML = '<div class="error">Error submitting form. Please try again.</div>';
-    });
-  }
-
-  // Load and embed form
-  function loadForm(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-      console.error('Container element not found:', containerId);
-      return;
-    }
-
-    // If jsEndpoint is configured, download form configuration first
-    if (formConfig.jsEndpoint) {
-      container.innerHTML = '<div class="dynamic-form"><div style="text-align: center; padding: 2rem; color: #6b7280;">Loading form...</div></div>';
-
-      fetch(formConfig.jsEndpoint)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to load form configuration');
-          }
-          return response.json();
-        })
-        .then(config => {
-          // Update form configuration with downloaded data
-          formConfig = { ...formConfig, ...config };
-          embedForm(containerId);
-        })
-        .catch(error => {
-          console.error('Error loading form:', error);
-          container.innerHTML = \`
-            <div class="dynamic-form">
-              <div class="error" style="text-align: center; padding: 2rem;">
-                Error loading form. Please try again later.
-              </div>
-            </div>
-          \`;
-        });
-    } else {
-      // Use embedded configuration
-      embedForm(containerId);
-    }
-  }
-
-  // Embed form in container
-  function embedForm(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-      console.error('Container element not found:', containerId);
-      return;
-    }
-
-    // Inject styles
-    injectStyles();
-
-    // Create form HTML
-    container.innerHTML = createFormHTML();
-
-    // Add form submission handler
-    const form = document.getElementById('dynamicForm');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        if (!validateForm(form)) {
-          return;
-        }
-
-        // Collect form data
-        const formData = new FormData(form);
-        const data = {};
-
-        for (let [key, value] of formData.entries()) {
-          if (data[key]) {
-            // Handle multiple values (checkboxes)
-            if (Array.isArray(data[key])) {
-              data[key].push(value);
-            } else {
-              data[key] = [data[key], value];
-            }
-          } else {
-            data[key] = value;
-          }
-        }
-
-        submitForm(data);
-      });
-    }
-  }
-
-  // Auto-load form when page loads
-  document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('dynamic-form-container');
-    if (container) {
-      loadForm('dynamic-form-container');
-    }
-  });
-
-  // Simple public API
-  window.FormLoader = {
-    load: loadForm
+      // Generate simple script tags like Google Analytics
+      return `<!-- Form Builder Script -->
+<script async src="${endpointUrl}/${formId}.js"><\/script>
+<script>
+  window.formConfig = window.formConfig || {};
+  window.formConfig['${formId}'] = {
+    containerId: 'form-${formId}',
+    formId: '${formId}'
   };
+<\/script>
 
+<!-- Usage: -->
+<!-- Add this div where you want the form to appear -->
+<div id="form-${formId}"></div>
+
+<!-- 
+Backend Endpoint Requirements:
+Your endpoint ${endpointUrl}/${formId}.js should return JavaScript that creates the form.
+
+Example response from ${endpointUrl}/${formId}.js:
+(function() {
+  const formData = ${JSON.stringify({
+    name: currentForm.value.name || 'Generated Form',
+    endpoint: currentForm.value.endpoint || '',
+    method: currentForm.value.method || 'POST',
+    headers: currentForm.value.headers || {},
+    fields: allFields.value
+  }, null, 2)};
+
+  // Your form generation code here
+  // This should create the form and inject it into the specified container
+
+  function createForm() {
+    const container = document.getElementById('form-${formId}');
+    if (container) {
+      // Generate and inject form HTML
+      container.innerHTML = generateFormHTML(formData);
+      // Add event listeners, validation, etc.
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createForm);
+  } else {
+    createForm();
+  }
 })();
-
-// Usage:
-// 1. Add this script to your HTML head
-// 2. Add <div id="dynamic-form-container"></div> where you want the form to appear
-// 3. The form will load automatically, or call FormLoader.load('your-container-id')`
+-->`
     }
 
     // Generate JavaScript field code helper

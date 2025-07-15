@@ -1,88 +1,73 @@
 # JavaScript Export Feature Documentation
 
-The JavaScript Export feature allows you to generate self-contained JavaScript code that can be embedded in any HTML page to dynamically load and render forms. This feature is particularly useful for:
+The JavaScript Export feature generates simple script tags that work just like Google Analytics - making form integration as easy as adding gtag to your website. This approach allows you to embed forms dynamically from your server with minimal code.
 
-- Embedding forms in static websites
-- Creating forms that can be updated without code changes
-- Integrating forms across multiple domains or applications
-- Implementing dynamic form loading from server endpoints
+This feature is particularly useful for:
+
+- Embedding forms in static websites with Google Analytics-style simplicity
+- Creating forms that can be updated on the server without changing HTML
+- Integrating forms across multiple domains with familiar patterns
+- Implementing dynamic form loading with cacheable JavaScript
 
 ## Table of Contents
 
 1. [How It Works](#how-it-works)
 2. [Generated Code Structure](#generated-code-structure)
 3. [Basic Implementation](#basic-implementation)
-4. [Backend Integration Concept](#backend-integration-concept)
-5. [Advanced Usage](#advanced-usage)
+4. [Backend Requirements](#backend-requirements)
+5. [Usage Examples](#usage-examples)
 6. [Security Considerations](#security-considerations)
 7. [Troubleshooting](#troubleshooting)
 
 ## How It Works
 
-The JavaScript export feature generates a self-contained script that:
+The JavaScript export feature generates simple script tags similar to Google Analytics:
 
-1. **Includes CSS Styles**: All necessary styling is embedded in the JavaScript
-2. **Creates Form HTML**: Dynamically generates form elements based on configuration
-3. **Handles Validation**: Provides client-side validation for required fields
-4. **Manages Submission**: Handles form submission to configured endpoints
-5. **Provides Public API**: Exposes methods for programmatic form control
+1. **Script Tag Generation**: Creates `<script>` tags that load from your endpoint
+2. **Dynamic Loading**: Your endpoint returns JavaScript that creates the form
+3. **Automatic Embedding**: The returned JavaScript injects the form into specified containers
+4. **Familiar Pattern**: Uses the same integration pattern as Google Analytics gtag
 
 ## Generated Code Structure
 
-The generated JavaScript code follows this structure:
+The generated code creates simple script tags similar to Google Analytics:
 
-```javascript
-(function() {
-  'use strict';
-
-  // Form configuration object
-  const formConfig = {
-    name: "Form Name",
-    endpoint: "https://api.example.com/submit",
-    method: "POST",
-    headers: {},
-    fields: [...],
-    jsEndpoint: "https://api.example.com/forms/form-id"
+```html
+<!-- Form Builder Script -->
+<script async src="https://your-domain.com/api/forms/contact-form.js"></script>
+<script>
+  window.formConfig = window.formConfig || {};
+  window.formConfig['contact-form'] = {
+    containerId: 'form-contact-form',
+    formId: 'contact-form'
   };
+</script>
 
-  // CSS styles (embedded)
-  const formStyles = `...`;
-
-  // Core functionality
-  function injectStyles() { ... }
-  function generateFieldHTML(field) { ... }
-  function createFormHTML() { ... }
-  function validateForm(form) { ... }
-  function submitForm(formData) { ... }
-  function initForm(containerId) { ... }
-
-  // Public API
-  window.DynamicFormLoader = {
-    load: initForm,
-    config: formConfig
-  };
-
-  // Auto-initialization
-  document.addEventListener('DOMContentLoaded', function() {
-    const defaultContainer = document.getElementById('dynamic-form-container');
-    if (defaultContainer) {
-      initForm('dynamic-form-container');
-    }
-  });
-})();
+<!-- Usage: Add this div where you want the form to appear -->
+<div id="form-contact-form"></div>
 ```
+
+### Comparison with Google Analytics
+
+| Google Analytics | Form Builder |
+|------------------|--------------|
+| `<script async src="https://www.googletagmanager.com/gtag/js?id=TAG_ID"></script>` | `<script async src="https://your-domain.com/api/forms/form-id.js"></script>` |
+| `gtag('js', new Date()); gtag('config', 'TAG_ID');` | `window.formConfig['form-id'] = { containerId: 'form-form-id' };` |
+
+The key difference is that instead of tracking analytics, your endpoint returns JavaScript that creates and embeds a form.
 
 ## Basic Implementation
 
-### Step 1: Generate JavaScript Code
+### Step 1: Generate Script Tags
 
 1. Open FormBuilder
 2. Create your form with desired fields
-3. Select "JavaScript (Head Script)" from the export format dropdown
-4. Click "Export Code"
-5. Copy the generated JavaScript code
+3. Configure your endpoint URL in the JavaScript Configuration section
+4. Select "JavaScript (Head Script)" from the export format dropdown
+5. Click "Export Code"
+6. Copy the generated script tags
 
-### Step 2: Embed in HTML
+### Step 2: Embed Script Tags in HTML
 
 ```html
 <!DOCTYPE html>
@@ -92,143 +77,237 @@ The generated JavaScript code follows this structure:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Form Page</title>
 
-    <!-- Paste your generated JavaScript code here -->
+    <!-- Form Builder Script (Google Analytics style) -->
+    <script async src="https://your-domain.com/api/forms/contact-form.js"></script>
     <script>
-        // Your generated FormBuilder JavaScript code
-        (function() {
-            // ... generated code ...
-        })();
+      window.formConfig = window.formConfig || {};
+      window.formConfig['contact-form'] = {
+        containerId: 'form-contact-form',
+        formId: 'contact-form'
+      };
     </script>
 </head>
 <body>
     <h1>Contact Form</h1>
 
-    <!-- Form will automatically load here -->
-    <div id="dynamic-form-container"></div>
+    <!-- Form will be loaded here -->
+    <div id="form-contact-form"></div>
 </body>
 </html>
 ```
 
-### Step 3: Customize Container (Optional)
+### Step 3: Set Up Your Backend Endpoint
+
+Your endpoint `https://your-domain.com/api/forms/contact-form.js` should return JavaScript that creates the form. See the [Backend Requirements](#backend-requirements) section for details.
+
+## Backend Requirements
+
+Your backend endpoint `https://your-domain.com/api/forms/{formId}.js` should return JavaScript code that creates and embeds the form. This is similar to how Google Analytics works - the script tag loads JavaScript that performs the actual functionality.
+
+### Endpoint Structure
+
+- **URL Pattern**: `https://your-domain.com/api/forms/{formId}.js`
+- **Method**: GET
+- **Response**: JavaScript code (Content-Type: application/javascript)
+- **Purpose**: Return JavaScript that creates and injects the form
+
+### Example Response
+
+Your endpoint should return JavaScript similar to this:
+
+```javascript
+(function() {
+  'use strict';
+
+  const formData = {
+    "name": "Contact Form",
+    "endpoint": "https://api.example.com/submit",
+    "method": "POST",
+    "headers": {},
+    "fields": [
+      {
+        "type": "text",
+        "key": "name",
+        "label": "Full Name",
+        "placeholder": "Enter your full name",
+        "required": true,
+        "width": "full"
+      },
+      {
+        "type": "email",
+        "key": "email",
+        "label": "Email Address",
+        "placeholder": "Enter your email",
+        "required": true,
+        "width": "full"
+      }
+    ]
+  };
+
+  // CSS styles for the form
+  const styles = `
+    .dynamic-form { 
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .form-group input, .form-group textarea { 
+      width: 100%; 
+      padding: 0.5rem; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+    }
+    .form-group button { 
+      background-color: #4f46e5; 
+      color: white; 
+      border: none; 
+      padding: 0.75rem 1.5rem; 
+      border-radius: 4px; 
+      cursor: pointer; 
+    }
+  `;
+
+  function injectStyles() {
+    if (!document.getElementById('form-styles')) {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'form-styles';
+      styleEl.textContent = styles;
+      document.head.appendChild(styleEl);
+    }
+  }
+
+  function createForm() {
+    const container = document.getElementById('form-contact-form');
+    if (container) {
+      injectStyles();
+
+      // Generate form HTML based on formData
+      const formHTML = generateFormHTML(formData);
+      container.innerHTML = formHTML;
+
+      // Add event listeners for form submission, validation, etc.
+      setupFormHandlers();
+    }
+  }
+
+  function generateFormHTML(data) {
+    // Your form generation logic here
+    // Return HTML string for the form
+  }
+
+  function setupFormHandlers() {
+    // Add form submission, validation, etc.
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createForm);
+  } else {
+    createForm();
+  }
+})();
+```
+
+### Key Benefits
+
+- **Dynamic Updates**: Change forms on your server without updating HTML
+- **Cacheable**: Browser can cache the JavaScript for better performance  
+- **Familiar Pattern**: Same integration approach as Google Analytics
+- **Lightweight**: No large embedded code in your HTML pages
+
+## Usage Examples
+
+### Single Form on a Page
+
+The most common use case - one form on a page:
 
 ```html
-<body>
-    <div id="my-custom-form-container"></div>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Contact Form Script -->
+    <script async src="https://your-domain.com/api/forms/contact-form.js"></script>
     <script>
-        // Load form into custom container after page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            DynamicFormLoader.load('my-custom-form-container');
-        });
+      window.formConfig = window.formConfig || {};
+      window.formConfig['contact-form'] = {
+        containerId: 'form-contact-form',
+        formId: 'contact-form'
+      };
     </script>
+</head>
+<body>
+    <h1>Contact Us</h1>
+    <div id="form-contact-form"></div>
 </body>
+</html>
 ```
 
-## Backend Integration Concept
+### Multiple Forms on Same Page
 
-The JavaScript export feature supports dynamic form loading from backend endpoints. This allows you to:
+You can include multiple forms by adding multiple script tags:
 
-- Store form configurations on your server
-- Update forms without regenerating JavaScript code
-- Implement form versioning and management
-- Use custom headers for authentication
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Contact Form -->
+    <script async src="https://your-domain.com/api/forms/contact-form.js"></script>
+    <script>
+      window.formConfig = window.formConfig || {};
+      window.formConfig['contact-form'] = {
+        containerId: 'form-contact-form',
+        formId: 'contact-form'
+      };
+    </script>
 
-### Basic Concept
+    <!-- Newsletter Signup -->
+    <script async src="https://your-domain.com/api/forms/newsletter.js"></script>
+    <script>
+      window.formConfig['newsletter'] = {
+        containerId: 'form-newsletter',
+        formId: 'newsletter'
+      };
+    </script>
+</head>
+<body>
+    <h1>Contact Us</h1>
+    <div id="form-contact-form"></div>
 
-The generated JavaScript can call your backend API to load form configurations dynamically. When you configure a "Form Endpoint URL" in the FormBuilder's JavaScript Configuration section, the generated script can:
-
-1. **Load forms by ID**: Call your endpoint with a form ID to get the configuration
-2. **Support custom headers**: Include authentication tokens or API keys
-3. **Handle errors gracefully**: Show appropriate messages when forms can't be loaded
-
-### Backend Requirements
-
-Your backend endpoint should:
-
-1. **Accept GET requests** at a URL like `/api/forms/{formId}`
-2. **Return JSON** with the form configuration
-3. **Handle authentication** if required
-4. **Support CORS** for cross-domain requests
-
-### Expected Response Format
-
-Your endpoint should return a JSON object with this structure:
-
-```json
-{
-  "name": "Contact Form",
-  "endpoint": "https://api.example.com/submit",
-  "method": "POST",
-  "headers": {
-    "X-API-Key": "your-api-key"
-  },
-  "fields": [
-    {
-      "type": "text",
-      "key": "name",
-      "label": "Full Name",
-      "placeholder": "Enter your full name",
-      "required": true,
-      "width": "full",
-      "options": [],
-      "validation": {}
-    }
-  ]
-}
+    <h2>Subscribe to Newsletter</h2>
+    <div id="form-newsletter"></div>
+</body>
+</html>
 ```
 
-## Advanced Usage
+### Different Forms on Different Pages
 
-### Dynamic Form Loading
+Each page can load its own form:
 
-The generated JavaScript provides a simple method to load forms:
+```html
+<!-- contact.html -->
+<script async src="https://your-domain.com/api/forms/contact-form.js"></script>
+<script>
+  window.formConfig = window.formConfig || {};
+  window.formConfig['contact-form'] = {
+    containerId: 'form-contact-form',
+    formId: 'contact-form'
+  };
+</script>
+<div id="form-contact-form"></div>
 
-```javascript
-// Load form into a specific container
-FormLoader.load('my-form-container');
-```
-
-### Loading from Endpoint
-
-If you configure a "Form Endpoint URL" in the FormBuilder's JavaScript Configuration section, the script will automatically download the form configuration from that endpoint when the page loads:
-
-```javascript
-// The form will automatically load from the configured endpoint
-// No additional code needed - just include the container div
-```
-
-### Backend Implementation Example
-
-Your backend endpoint should handle GET requests and return form configuration:
-
-```javascript
-// Example endpoint response
-GET /api/forms/contact-form
-
-{
-  "name": "Contact Form",
-  "endpoint": "https://api.example.com/submit",
-  "method": "POST",
-  "headers": {
-    "X-API-Key": "your-api-key"
-  },
-  "fields": [
-    {
-      "type": "text",
-      "key": "name",
-      "label": "Full Name",
-      "required": true,
-      "width": "full"
-    },
-    {
-      "type": "email", 
-      "key": "email",
-      "label": "Email Address",
-      "required": true,
-      "width": "full"
-    }
-  ]
-}
+<!-- signup.html -->
+<script async src="https://your-domain.com/api/forms/user-signup.js"></script>
+<script>
+  window.formConfig = window.formConfig || {};
+  window.formConfig['user-signup'] = {
+    containerId: 'form-user-signup',
+    formId: 'user-signup'
+  };
+</script>
+<div id="form-user-signup"></div>
 ```
 
 ### Custom Styling
@@ -288,42 +367,62 @@ Implement rate limiting on your form endpoints to prevent abuse.
 
 ### CORS Configuration
 
-Configure CORS properly for cross-domain form submissions.
+Configure CORS properly for cross-domain requests to your form endpoints.
+
+### Content Security Policy (CSP)
+
+If you use CSP headers, make sure to allow:
+- Script loading from your form endpoint domain
+- Inline scripts for the configuration code
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Form not loading**: Check browser console for JavaScript errors
-2. **CORS errors**: Ensure your backend allows cross-origin requests
-3. **Validation errors**: Verify field validation rules match between frontend and backend
+1. **Form not loading**: Check browser console for JavaScript errors and network requests
+2. **Script loading errors**: Verify your endpoint URL is correct and accessible
+3. **CORS errors**: Ensure your backend allows cross-origin requests
+4. **Container not found**: Make sure the container div ID matches the configuration
 
 ### Debug Mode
 
-Add debug logging to your generated JavaScript:
+Add debug logging to your backend JavaScript response:
 
 ```javascript
-// Add this to your form configuration
+// Add this to your endpoint's JavaScript response
 const DEBUG = true;
 
 function debugLog(message, data) {
   if (DEBUG) {
-    console.log('[DynamicForm]', message, data);
+    console.log('[FormBuilder]', message, data);
   }
 }
 
-// Use throughout the code
-debugLog('Form initialized', formConfig);
-debugLog('Form submitted', formData);
+// Use throughout your form creation code
+debugLog('Form script loaded', formData);
+debugLog('Container found', container);
+debugLog('Form created successfully');
 ```
 
-### Testing
+### Testing Your Implementation
 
 Test your forms thoroughly:
 
-1. **Validation testing**: Test all validation rules
-2. **Cross-browser testing**: Ensure compatibility across browsers
-3. **Mobile testing**: Test responsive behavior
-4. **Error handling**: Test error scenarios (network failures, server errors)
+1. **Script Loading**: Verify the script loads from your endpoint
+2. **Form Rendering**: Check that forms render correctly in the container
+3. **Cross-browser Testing**: Ensure compatibility across browsers
+4. **Mobile Testing**: Test responsive behavior
+5. **Error Handling**: Test scenarios like network failures or missing containers
 
-This documentation covers the JavaScript export feature and provides guidance for implementing backend integration according to your specific requirements.
+### Backend Testing
+
+Test your backend endpoint:
+
+```bash
+# Test that your endpoint returns JavaScript
+curl -H "Accept: application/javascript" https://your-domain.com/api/forms/contact-form.js
+
+# Should return JavaScript code, not JSON
+```
+
+This Google Analytics-style approach makes form integration simple and familiar for developers while providing the flexibility to update forms dynamically from your server.
