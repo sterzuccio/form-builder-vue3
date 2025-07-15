@@ -1,6 +1,7 @@
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
+    // Removed Tailwind processing since we're using standalone CSS
+    // '@tailwindcss/postcss': {},
     autoprefixer: {},
   },
 }

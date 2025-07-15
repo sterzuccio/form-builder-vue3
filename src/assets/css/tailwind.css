@@ -1,25 +1,386 @@
-@import "tailwindcss";
+/* Form Builder Vue3 - Standalone CSS */
+/* This CSS file contains only the essential styles needed for the form builder component */
+/* It does not use Tailwind layers to ensure compatibility with all consumer projects */
 
-/* Ensure grid classes are available */
-@layer utilities {
-  .grid { display: grid; }
-  .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-  .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .col-span-1 { grid-column: span 1 / span 1; }
-  .col-span-2 { grid-column: span 2 / span 2; }
-  .col-span-4 { grid-column: span 4 / span 4; }
-  .gap-4 { gap: 1rem; }
-  .gap-6 { gap: 1.5rem; }
+/* Reset and base styles */
+.form-builder * {
+  box-sizing: border-box;
+}
 
-  @media (min-width: 768px) {
-    .md\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .md\:col-span-1 { grid-column: span 1 / span 1; }
-    .md\:col-span-2 { grid-column: span 2 / span 2; }
-    .md\:col-span-4 { grid-column: span 4 / span 4; }
+/* Grid layout utilities */
+.form-builder .grid {
+  display: grid;
+}
+
+.form-builder .grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.form-builder .grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-builder .grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.form-builder .col-span-1 {
+  grid-column: span 1 / span 1;
+}
+
+.form-builder .col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+.form-builder .col-span-4 {
+  grid-column: span 4 / span 4;
+}
+
+.form-builder .gap-4 {
+  gap: 1rem;
+}
+
+.form-builder .gap-6 {
+  gap: 1.5rem;
+}
+
+/* Responsive grid utilities */
+@media (min-width: 768px) {
+  .form-builder .md\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
+
+  .form-builder .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-builder .md\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .form-builder .md\:col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+
+  .form-builder .md\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
+  .form-builder .md\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+}
+
+/* Essential utility classes for form builder */
+.form-builder .bg-white {
+  background-color: #ffffff;
+}
+
+.form-builder .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.form-builder .rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.form-builder .p-4 {
+  padding: 1rem;
+}
+
+.form-builder .mb-4 {
+  margin-bottom: 1rem;
+}
+
+.form-builder .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem;
+}
+
+.form-builder .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem;
+}
+
+.form-builder .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-left: 0.5rem;
+}
+
+.form-builder .flex {
+  display: flex;
+}
+
+.form-builder .items-center {
+  align-items: center;
+}
+
+.form-builder .justify-between {
+  justify-content: space-between;
+}
+
+.form-builder .text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.form-builder .font-medium {
+  font-weight: 500;
+}
+
+.form-builder .text-gray-900 {
+  color: #111827;
+}
+
+.form-builder .text-gray-700 {
+  color: #374151;
+}
+
+.form-builder .text-gray-500 {
+  color: #6b7280;
+}
+
+.form-builder .border {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #d1d5db;
+}
+
+.form-builder .border-2 {
+  border-width: 2px;
+}
+
+.form-builder .border-dashed {
+  border-style: dashed;
+}
+
+.form-builder .border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.form-builder .rounded-md {
+  border-radius: 0.375rem;
+}
+
+.form-builder .bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.form-builder .cursor-move {
+  cursor: move;
+}
+
+.form-builder .hover\:bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+
+.form-builder .min-h-\[400px\] {
+  min-height: 400px;
+}
+
+.form-builder .text-center {
+  text-align: center;
+}
+
+.form-builder .py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.form-builder .relative {
+  position: relative;
+}
+
+.form-builder .hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.form-builder .text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.form-builder .block {
+  display: block;
+}
+
+.form-builder .w-full {
+  width: 100%;
+}
+
+.form-builder .mt-1 {
+  margin-top: 0.25rem;
+}
+
+.form-builder .py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.form-builder .px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.form-builder .px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.form-builder .py-1\.5 {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+.form-builder .inline-flex {
+  display: inline-flex;
+}
+
+.form-builder .border-transparent {
+  border-color: transparent;
+}
+
+.form-builder .text-white {
+  color: #ffffff;
+}
+
+.form-builder .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.form-builder .focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.form-builder .focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.form-builder .focus\:ring-offset-2:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+.form-builder .text-red-500 {
+  color: #ef4444;
+}
+
+.form-builder .hover\:text-red-700:hover {
+  color: #b91c1c;
+}
+
+.form-builder .hover\:text-gray-700:hover {
+  color: #374151;
+}
+
+.form-builder .fixed {
+  position: fixed;
+}
+
+.form-builder .inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.form-builder .bg-gray-500 {
+  background-color: #6b7280;
+}
+
+.form-builder .bg-opacity-75 {
+  background-color: rgba(107, 114, 128, 0.75);
+}
+
+.form-builder .max-w-md {
+  max-width: 28rem;
+}
+
+.form-builder .p-6 {
+  padding: 1.5rem;
+}
+
+.form-builder .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.form-builder .h-4 {
+  height: 1rem;
+}
+
+.form-builder .w-4 {
+  width: 1rem;
+}
+
+.form-builder .ml-2 {
+  margin-left: 0.5rem;
+}
+
+.form-builder .mr-3 {
+  margin-right: 0.75rem;
+}
+
+.form-builder .mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.form-builder .w-1\/3 {
+  width: 33.333333%;
+}
+
+.form-builder .w-2\/3 {
+  width: 66.666667%;
+}
+
+.form-builder .rounded-l-md {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.form-builder .rounded-r-md {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.form-builder .overflow-auto {
+  overflow: auto;
+}
+
+.form-builder .max-h-96 {
+  max-height: 24rem;
+}
+
+.form-builder .border-red-500 {
+  border-color: #ef4444;
+}
+
+.form-builder .text-red-600 {
+  color: #dc2626;
+}
+
+.form-builder .mt-1 {
+  margin-top: 0.25rem;
+}
+
+.form-builder .opacity-50 {
+  opacity: 0.5;
+}
+
+.form-builder .cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.form-builder .hidden {
+  display: none;
+}
+
+.form-builder .z-50 {
+  z-index: 50;
+}
+
+.form-builder .pointer-events-none {
+  pointer-events: none;
+}
+
+.form-builder .transform {
+  transform: translateX(var(--tw-translate-x, 0)) translateY(var(--tw-translate-y, 0)) rotate(var(--tw-rotate, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1));
 }
 
 /* Custom styles can be added here */
