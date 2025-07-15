@@ -28,20 +28,20 @@
               type="text" 
               id="form-name" 
               v-model="currentForm.name" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               placeholder="Enter form name"
             >
           </div>
           <div class="flex space-x-2">
             <button 
               @click="saveForm" 
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
             >
               Save Form
             </button>
             <button 
               @click="exportFormCode" 
-              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              :class="`inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
             >
               Export Code
             </button>
@@ -119,7 +119,7 @@
               type="text" 
               id="endpoint" 
               v-model="currentForm.endpoint" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               placeholder="https://api.example.com/submit"
             >
           </div>
@@ -129,7 +129,7 @@
             <select 
               id="method" 
               v-model="currentForm.method" 
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
             >
               <option value="GET">GET</option>
               <option value="POST">POST</option>
@@ -145,19 +145,19 @@
               <input 
                 type="text" 
                 v-model="headerKeys[key]" 
-                class="w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 placeholder="Key"
               >
               <input 
                 type="text" 
                 v-model="headers[key]" 
-                class="w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 placeholder="Value"
               >
             </div>
             <button 
               @click="addHeader" 
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              :class="`inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
             >
               Add Header
             </button>
@@ -252,7 +252,7 @@
                   type="number" 
                   id="field-min" 
                   v-model="editingField.validation.min" 
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
               <div>
@@ -261,7 +261,7 @@
                   type="number" 
                   id="field-max" 
                   v-model="editingField.validation.max" 
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
             </div>
@@ -273,7 +273,7 @@
                   type="number" 
                   id="field-min" 
                   v-model="editingField.validation.min" 
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
               <div>
@@ -282,7 +282,7 @@
                   type="number" 
                   id="field-max" 
                   v-model="editingField.validation.max" 
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 >
               </div>
             </div>
@@ -293,7 +293,7 @@
                 type="text" 
                 id="field-pattern" 
                 v-model="editingField.validation.pattern" 
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
               >
             </div>
           </div>
@@ -306,13 +306,13 @@
               <input 
                 type="text" 
                 v-model="option.value" 
-                class="w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`w-1/3 border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 placeholder="Value"
               >
               <input 
                 type="text" 
                 v-model="option.label" 
-                class="w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="`w-2/3 border border-gray-300 rounded-r-md shadow-sm py-2 px-3 focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
                 placeholder="Label"
               >
               <button 
@@ -325,7 +325,7 @@
 
             <button 
               @click="addOption" 
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              :class="`inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
             >
               Add Option
             </button>
@@ -335,13 +335,13 @@
         <div class="mt-6 flex justify-end space-x-3">
           <button 
             @click="closeFieldModal" 
-            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :class="`inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
           >
             Cancel
           </button>
           <button 
             @click="saveField" 
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${colorClasses.bg600} ${colorClasses.hoverBg700} focus:outline-none ${colorClasses.ring} ${colorClasses.ringOffset} ${colorClasses.ringColor}`"
           >
             Save
           </button>
@@ -384,6 +384,32 @@
       :timeout="notificationTimeout"
       :color="color"
     />
+
+    <!-- Confirmation Modal -->
+    <div v-if="showConfirmation" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">{{ confirmationTitle }}</h3>
+
+        <div class="mb-6">
+          <p class="text-gray-700">{{ confirmationMessage }}</p>
+        </div>
+
+        <div class="flex justify-end space-x-3">
+          <button 
+            @click="cancelDelete" 
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="confirmDelete" 
+            :class="`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500`"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -399,17 +425,46 @@ export default {
   props: {
     // Color customization
     color: {
-      type: String,
+      type: [String, Object],
       default: 'indigo',
       validator: (value) => {
-        // Common Tailwind colors
-        const validColors = [
-          'slate', 'gray', 'zinc', 'neutral', 'stone',
-          'red', 'orange', 'amber', 'yellow', 'lime', 'green',
-          'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo',
-          'violet', 'purple', 'fuchsia', 'pink', 'rose'
-        ]
-        return validColors.includes(value)
+        // If it's a string, validate against common Tailwind colors
+        if (typeof value === 'string') {
+          const validColors = [
+            'slate', 'gray', 'zinc', 'neutral', 'stone',
+            'red', 'orange', 'amber', 'yellow', 'lime', 'green',
+            'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo',
+            'violet', 'purple', 'fuchsia', 'pink', 'rose'
+          ]
+          return validColors.includes(value)
+        }
+
+        // If it's an object, validate it has the required structure for custom colors
+        if (typeof value === 'object' && value !== null) {
+          // Must have a name property
+          if (!value.name || typeof value.name !== 'string') {
+            return false
+          }
+
+          // Must have a colors property with the required shades
+          if (!value.colors || typeof value.colors !== 'object') {
+            return false
+          }
+
+          // Check that all required shades are present and are valid hex colors
+          const requiredShades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
+          const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+
+          for (const shade of requiredShades) {
+            if (!value.colors[shade] || !hexColorRegex.test(value.colors[shade])) {
+              return false
+            }
+          }
+
+          return true
+        }
+
+        return false
       }
     }
   },
@@ -443,6 +498,12 @@ export default {
     const notificationMessage = ref('')
     const notificationButtonText = ref('OK')
     const notificationTimeout = ref(3000) // Auto-close after 3 seconds
+
+    // Confirmation modal
+    const showConfirmation = ref(false)
+    const confirmationTitle = ref('Confirm Action')
+    const confirmationMessage = ref('')
+    const pendingDeleteIndex = ref(-1)
 
     onMounted(() => {
       // Check if we're editing an existing form
@@ -565,9 +626,23 @@ export default {
     })
 
     const deleteField = (index) => {
-      if (confirm('Are you sure you want to delete this field?')) {
-        store.dispatch('deleteField', index)
+      pendingDeleteIndex.value = index
+      confirmationTitle.value = 'Delete Field'
+      confirmationMessage.value = 'Are you sure you want to delete this field? This action cannot be undone.'
+      showConfirmation.value = true
+    }
+
+    const confirmDelete = () => {
+      if (pendingDeleteIndex.value !== -1) {
+        store.dispatch('deleteField', pendingDeleteIndex.value)
+        pendingDeleteIndex.value = -1
       }
+      showConfirmation.value = false
+    }
+
+    const cancelDelete = () => {
+      pendingDeleteIndex.value = -1
+      showConfirmation.value = false
     }
 
     // Options management for select, radio, checkbox
@@ -619,9 +694,12 @@ export default {
 
     // Export form code
     const exportFormCode = () => {
+      // Get the current color name for the exported code
+      const currentColorName = typeof props.color === 'string' ? props.color : (props.color?.name || 'indigo')
+
       // Generate Vue component code for the form
       const formFields = currentForm.value.fields.map(field => {
-        return generateFieldCode(field)
+        return generateFieldCode(field, currentColorName)
       }).join('\n      ')
 
       const validationRules = currentForm.value.fields.reduce((rules, field) => {
@@ -636,7 +714,7 @@ export default {
   '  <form @submit.prevent="submitForm" class="space-y-6">\n' +
   '    ' + formFields + '\n' +
   '    <div>\n' +
-  '      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">\n' +
+  `      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-${currentColorName}-600 hover:bg-${currentColorName}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${currentColorName}-500">\n` +
   '        Submit\n' +
   '      </button>\n' +
   '    </div>\n' +
@@ -653,7 +731,7 @@ export default {
   '        <div class="flex justify-end">\n' +
   '          <button \n' +
   '            @click="closeNotification" \n' +
-  '            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"\n' +
+  `            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-${currentColorName}-600 hover:bg-${currentColorName}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${currentColorName}-500"\n` +
   '          >\n' +
   '            OK\n' +
   '          </button>\n' +
@@ -759,7 +837,7 @@ export default {
       showExportModal.value = true
     }
 
-    const generateFieldCode = (field) => {
+    const generateFieldCode = (field, colorName = 'indigo') => {
       const fieldName = field.key || field.type + field.label.replace(/\s+/g, '')
       const requiredAttr = field.required ? ' required' : ''
       const errorDisplay = `<p v-if="errors['${fieldName}']" class="mt-2 text-sm text-red-600">{{ errors['${fieldName}'] }}</p>`
@@ -777,7 +855,7 @@ export default {
           type="${field.type}" 
           id="${fieldName}" 
           v-model="formData.${fieldName}"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-${colorName}-500 focus:border-${colorName}-500 sm:text-sm"
           placeholder="${field.placeholder || ''}"${requiredAttr}
         >
         ${errorDisplay}
@@ -789,7 +867,7 @@ export default {
         <textarea 
           id="${fieldName}" 
           v-model="formData.${fieldName}"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-${colorName}-500 focus:border-${colorName}-500 sm:text-sm"
           placeholder="${field.placeholder || ''}"${requiredAttr}
         ></textarea>
         ${errorDisplay}
@@ -801,7 +879,7 @@ export default {
         <select 
           id="${fieldName}" 
           v-model="formData.${fieldName}"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"${requiredAttr}
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-${colorName}-500 focus:border-${colorName}-500 sm:text-sm"${requiredAttr}
         >
           <option value="" disabled>Select an option</option>
           ${field.options.map(option => `<option value="${option.value}">${option.label}</option>`).join('\n          ')}
@@ -821,7 +899,7 @@ export default {
               name="${fieldName}" 
               value="${option.value}" 
               v-model="formData.${fieldName}"
-              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"${requiredAttr}
+              class="h-4 w-4 text-${colorName}-600 focus:ring-${colorName}-500 border-gray-300"${requiredAttr}
             >
             <label for="${fieldName}_${option.value}" class="ml-3 block text-sm font-medium text-gray-700">
               ${option.label}
@@ -843,7 +921,7 @@ export default {
               id="${fieldName}_${option.value}" 
               value="${option.value}" 
               v-model="formData.${fieldName}"
-              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              class="h-4 w-4 text-${colorName}-600 focus:ring-${colorName}-500 border-gray-300 rounded"
             >
             <label for="${fieldName}_${option.value}" class="ml-3 block text-sm font-medium text-gray-700">
               ${option.label}
@@ -858,7 +936,7 @@ export default {
           type="checkbox" 
           id="${fieldName}" 
           v-model="formData.${fieldName}"
-          class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"${requiredAttr}
+          class="h-4 w-4 text-${colorName}-600 focus:ring-${colorName}-500 border-gray-300 rounded"${requiredAttr}
         >
         <label for="${fieldName}" class="ml-3 block text-sm font-medium text-gray-700">
           ${field.label}${field.required ? ' *' : ''}
@@ -874,7 +952,7 @@ export default {
           type="text" 
           id="${fieldName}" 
           v-model="formData.${fieldName}"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-${colorName}-500 focus:border-${colorName}-500 sm:text-sm"
           placeholder="${field.placeholder || ''}"${requiredAttr}
         >
         ${errorDisplay}
@@ -943,29 +1021,80 @@ export default {
         })
     }
 
+    // Function to inject custom color styles into the document
+    const injectCustomColorStyles = (customColor) => {
+      const styleId = `custom-color-${customColor.name}`
+
+      // Remove existing style if it exists
+      const existingStyle = document.getElementById(styleId)
+      if (existingStyle) {
+        existingStyle.remove()
+      }
+
+      // Create CSS rules for all shades and states
+      const cssRules = []
+
+      // Generate CSS for each shade
+      Object.entries(customColor.colors).forEach(([shade, hexColor]) => {
+        // Text colors
+        cssRules.push(`.text-${customColor.name}-${shade} { color: ${hexColor} !important; }`)
+
+        // Background colors
+        cssRules.push(`.bg-${customColor.name}-${shade} { background-color: ${hexColor} !important; }`)
+
+        // Border colors
+        cssRules.push(`.border-${customColor.name}-${shade} { border-color: ${hexColor} !important; }`)
+
+        // Focus states
+        cssRules.push(`.focus\\:ring-${customColor.name}-${shade}:focus { --tw-ring-color: ${hexColor} !important; }`)
+        cssRules.push(`.focus\\:border-${customColor.name}-${shade}:focus { border-color: ${hexColor} !important; }`)
+
+        // Hover states
+        cssRules.push(`.hover\\:bg-${customColor.name}-${shade}:hover { background-color: ${hexColor} !important; }`)
+        cssRules.push(`.hover\\:text-${customColor.name}-${shade}:hover { color: ${hexColor} !important; }`)
+      })
+
+      // Create and inject the style element
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
+      styleElement.textContent = cssRules.join('\n')
+      document.head.appendChild(styleElement)
+    }
+
     // Color computed properties
     const colorClasses = computed(() => {
       const color = props.color
+      let colorName
+
+      // Handle both string (standard colors) and object (custom colors)
+      if (typeof color === 'string') {
+        colorName = color
+      } else if (typeof color === 'object' && color.name) {
+        colorName = color.name
+        // Inject custom color definitions into the document
+        injectCustomColorStyles(color)
+      }
+
       return {
         // Focus ring and border colors
-        focusRing: `focus:ring-${color}-500`,
-        focusBorder: `focus:border-${color}-500`,
+        focusRing: `focus:ring-${colorName}-500`,
+        focusBorder: `focus:border-${colorName}-500`,
 
         // Text colors
-        text600: `text-${color}-600`,
-        text500: `text-${color}-500`,
+        text600: `text-${colorName}-600`,
+        text500: `text-${colorName}-500`,
 
         // Background colors
-        bg600: `bg-${color}-600`,
-        bg700: `bg-${color}-700`,
+        bg600: `bg-${colorName}-600`,
+        bg700: `bg-${colorName}-700`,
 
         // Hover background colors
-        hoverBg700: `hover:bg-${color}-700`,
+        hoverBg700: `hover:bg-${colorName}-700`,
 
         // Ring colors for focus states
         ringOffset: `focus:ring-offset-2`,
         ring: `focus:ring-2`,
-        ringColor: `focus:ring-${color}-500`
+        ringColor: `focus:ring-${colorName}-500`
       }
     })
 
@@ -986,6 +1115,10 @@ export default {
       notificationMessage,
       notificationButtonText,
       notificationTimeout,
+      showConfirmation,
+      confirmationTitle,
+      confirmationMessage,
+      pendingDeleteIndex,
       onDragStart,
       onDrop,
       getComponentLabel,
@@ -993,6 +1126,8 @@ export default {
       saveField,
       closeFieldModal,
       deleteField,
+      confirmDelete,
+      cancelDelete,
       addOption,
       removeOption,
       addHeader,

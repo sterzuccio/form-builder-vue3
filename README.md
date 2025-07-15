@@ -15,7 +15,9 @@ Repository git: [form-builder-vue3](https://github.com/sterzuccio/form-builder-v
 - **Component Selection**: Choose which components to use when instantiating the library
 - **Endpoint Configuration**: Configure endpoints, HTTP methods, and custom headers
 - **Field Validation**: Support for required, min, max, and pattern validations
-- **Customizable Fields**: Customize labels, placeholders, required status, field width, and options for select/radio fields
+- **Customizable Fields**: Customize labels, placeholders, required status, hidden status, field width, and options for select/radio fields
+- **Required Fields**: Support for required fields
+- **Hidden Fields**: Support for hidden fields with default values that are not visible in the form but are included in form submissions
 - **Color Customization**: Customize component colors using Tailwind CSS color palette (indigo by default)
 - **Comprehensive Tests**: Includes unit and integration tests for all components
 
@@ -289,6 +291,8 @@ Each field in the form has the following properties:
 | label | String | Label for the field |
 | placeholder | String | Placeholder text for the field |
 | required | Boolean | Whether the field is required |
+| hidden | Boolean | Whether the field is hidden from the form display but included in submissions |
+| defaultValue | String | Default value for hidden fields (only used when hidden is true) |
 | width | String | Width of the field ('full' or 'half'). Full width spans the entire form, half width allows two fields to be placed side by side |
 | validation | Object | Validation rules for the field (e.g., min, max, pattern) |
 | options | Array | Options for select, radio, and checkbox fields |
