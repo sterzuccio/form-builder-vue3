@@ -1203,12 +1203,12 @@ export default {
 
     // Generate form code
     const generateFormCode = () => {
-      // Generate Vue component code for the form
-      const formFields = currentForm.value.fields.map(field => {
+      // Generate Vue component code for the form using allFields (includes requiredComponents + regular fields)
+      const formFields = allFields.value.map(field => {
         return generateFieldCode(field)
       }).join('\n      ')
 
-      const validationRules = currentForm.value.fields.reduce((rules, field) => {
+      const validationRules = allFields.value.reduce((rules, field) => {
         if (field.required || field.validation) {
           rules[field.key || field.name || field.type + field.label.replace(/\s+/g, '')] = generateValidationRules(field)
         }
@@ -1254,7 +1254,7 @@ export default {
   '  name: \'' + (currentForm.value.name || 'GeneratedForm') + '\',\n' +
   '  setup() {\n' +
   '    const formData = reactive({\n' +
-  '      ' + currentForm.value.fields.map(field => {
+  '      ' + allFields.value.map(field => {
           const fieldName = field.key || field.name || field.type + field.label.replace(/\s+/g, '')
           return fieldName + ': ' + getDefaultValueForType(field.type, field)
         }).join(',\n      ') + '\n' +
@@ -1369,12 +1369,18 @@ export default {
 
     // Generate JSON code for the form
     const generateJsonCode = () => {
-      return JSON.stringify(currentForm.value, null, 2)
+      // Create a combined form object that includes requiredComponents
+      const combinedForm = {
+        ...currentForm.value,
+        fields: allFields.value,
+        requiredComponents: props.requiredComponents || []
+      }
+      return JSON.stringify(combinedForm, null, 2)
     }
 
     // Generate embeddable HTML code for the form
     const generateHtmlCode = () => {
-      const formFields = currentForm.value.fields.map(field => {
+      const formFields = allFields.value.map(field => {
         return generateHtmlFieldCode(field)
       }).join('\n      ')
 

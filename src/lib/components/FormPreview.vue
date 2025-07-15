@@ -15,11 +15,12 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <form @submit.prevent="submitForm" class="space-y-6">
-          <div v-for="(field, index) in form.fields" :key="index" 
+          <div v-for="(field, index) in allFields" :key="field.isRequiredComponent ? `required-${field.requiredIndex}` : `regular-${field.regularIndex}`" 
                v-show="!field.hidden || previewMode"
                :class="[
                  'form-field',
-                 field.hidden && previewMode ? 'opacity-50 pointer-events-none relative' : ''
+                 field.hidden && previewMode ? 'opacity-50 pointer-events-none relative' : '',
+                 field.isRequiredComponent ? 'bg-blue-50 border border-blue-200 rounded-md p-2' : ''
                ]">
             <!-- Hidden field indicator for preview mode -->
             <div v-if="field.hidden && previewMode" class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl-md z-10">
@@ -273,6 +274,11 @@ export default {
       type: String,
       default: null
     },
+    // Required components that are always visible and cannot be modified
+    requiredComponents: {
+      type: Array,
+      default: () => []
+    },
     // UI configuration
     showHeader: {
       type: Boolean,
@@ -389,6 +395,36 @@ export default {
       }
     }
 
+    // Combined fields (required components + regular fields)
+    const allFields = computed(() => {
+      const combined = []
+
+      // Add required components first (marked as required and non-editable)
+      if (props.requiredComponents && props.requiredComponents.length > 0) {
+        props.requiredComponents.forEach((component, index) => {
+          combined.push({
+            ...component,
+            required: true,
+            isRequiredComponent: true,
+            requiredIndex: index
+          })
+        })
+      }
+
+      // Add regular form fields
+      if (props.form.fields && props.form.fields.length > 0) {
+        props.form.fields.forEach((field, index) => {
+          combined.push({
+            ...field,
+            isRequiredComponent: false,
+            regularIndex: index
+          })
+        })
+      }
+
+      return combined
+    })
+
     // Form data
     const formData = reactive({})
     const errors = ref({})
@@ -431,8 +467,8 @@ export default {
     }
 
     const initializeFormData = (form) => {
-      // Initialize form data with default values
-      form.fields.forEach(field => {
+      // Initialize form data with default values using allFields (includes requiredComponents)
+      allFields.value.forEach(field => {
         const fieldId = getFieldId(field)
 
         // If field is hidden and has a default value, use it
@@ -465,7 +501,7 @@ export default {
     const validate = () => {
       const newErrors = {}
 
-      props.form.fields.forEach(field => {
+      allFields.value.forEach(field => {
         const fieldId = getFieldId(field)
         const value = formData[fieldId]
 
@@ -663,6 +699,7 @@ export default {
     })
 
     return {
+      allFields,
       formData,
       errors,
       showResultModal,

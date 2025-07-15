@@ -236,14 +236,25 @@ In addition to standard Tailwind colors, you can also define custom colors with 
 
 ### Required Components
 
-The FormBuilder component supports a `requiredComponents` prop that allows you to define components that are always visible, always required, and cannot be modified by users. This is perfect for mandatory fields, system fields, or compliance requirements.
+Both FormBuilder and FormPreview components support a `requiredComponents` prop that allows you to define components that are always visible, always required, and cannot be modified by users. This is perfect for mandatory fields, system fields, or compliance requirements.
 
 ```vue
 <template>
-  <FormBuilder
-    :required-components="requiredComponents"
-    :initial-form="initialForm"
-  />
+  <div>
+    <!-- Form Builder -->
+    <FormBuilder
+      :required-components="requiredComponents"
+      :initial-form="initialForm"
+      @save="handleSave"
+    />
+
+    <!-- Form Preview -->
+    <FormPreview
+      :form="form"
+      :required-components="requiredComponents"
+      @submit="handleSubmit"
+    />
+  </div>
 </template>
 
 <script>
@@ -268,7 +279,23 @@ export default {
       }
     ]
 
-    return { requiredComponents }
+    const form = ref({
+      name: 'Employee Form',
+      fields: [],
+      endpoint: '/api/submit',
+      method: 'POST'
+    })
+
+    const handleSave = (savedForm) => {
+      form.value = savedForm
+    }
+
+    const handleSubmit = (formData) => {
+      // formData includes both required components and regular fields
+      console.log('Form submitted:', formData)
+    }
+
+    return { requiredComponents, form, handleSave, handleSubmit }
   }
 }
 </script>
@@ -277,8 +304,16 @@ export default {
 **Key Features:**
 - Required components appear first in the form and have a distinctive blue background
 - They display a "Required" badge and cannot be edited or deleted by users
-- They work alongside regular draggable components
+- They work alongside regular draggable components in both FormBuilder and FormPreview
+- Fully integrated with form export functionality (Vue, JSON, HTML formats)
+- Form validation and submission includes required components
 - Perfect for mandatory fields, system requirements, or compliance needs
+
+**Recent Improvements (v0.6.0):**
+- FormPreview now fully supports required components
+- All export formats include required components in generated code
+- Enhanced form validation for required components
+- Improved visual consistency between FormBuilder and FormPreview
 
 For detailed usage examples and advanced configurations, see the [Required Components Documentation](documentation/REQUIRED_COMPONENTS_FEATURE.md).
 
@@ -305,6 +340,7 @@ For detailed usage examples and advanced configurations, see the [Required Compo
 |------|------|---------|-------------|
 | form | Object | Required | Form data to preview |
 | formId | String | `null` | ID to load form from store |
+| requiredComponents | Array | `[]` | Components that are always visible, always required, and cannot be modified by users. Must match the array used in FormBuilder for consistent display. See [Required Components Documentation](documentation/REQUIRED_COMPONENTS_FEATURE.md) for details. |
 | showHeader | Boolean | `true` | Whether to show the header |
 | color | String \| Object | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) or a custom color object with all required shades. See [Custom Colors Documentation](documentation/CUSTOM_COLORS.md) for object format. |
 

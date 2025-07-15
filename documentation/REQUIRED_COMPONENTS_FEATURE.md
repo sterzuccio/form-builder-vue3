@@ -6,7 +6,7 @@ The FormBuilder component now supports a new `requiredComponents` prop that allo
 
 ## Usage
 
-### Basic Example
+### Basic Example with FormBuilder
 
 ```vue
 <template>
@@ -71,13 +71,103 @@ export default {
 </script>
 ```
 
-## Prop Definition
+### Using with FormPreview
 
-### `requiredComponents`
+The FormPreview component also supports required components, allowing you to preview forms that include both required and regular components:
+
+```vue
+<template>
+  <div>
+    <!-- Form Builder -->
+    <FormBuilder
+      :required-components="requiredComponents"
+      :initial-form="form"
+      @save="handleSave"
+    />
+
+    <!-- Form Preview -->
+    <FormPreview
+      :form="form"
+      :required-components="requiredComponents"
+      @submit="handleSubmit"
+    />
+  </div>
+</template>
+
+<script>
+import { FormBuilder, FormPreview } from 'form-builder-vue3'
+
+export default {
+  components: {
+    FormBuilder,
+    FormPreview
+  },
+  setup() {
+    const requiredComponents = [
+      {
+        type: 'text',
+        label: 'Full Name',
+        key: 'fullName',
+        placeholder: 'Enter your full name',
+        required: true,
+        width: 'full'
+      },
+      {
+        type: 'email',
+        label: 'Email Address',
+        key: 'email',
+        placeholder: 'Enter your email',
+        required: true,
+        width: 'half'
+      }
+    ]
+
+    const form = ref({
+      name: 'Employee Registration Form',
+      fields: [],
+      endpoint: '/api/employees',
+      method: 'POST'
+    })
+
+    const handleSave = (savedForm) => {
+      form.value = savedForm
+    }
+
+    const handleSubmit = (formData) => {
+      console.log('Form submitted with data:', formData)
+      // formData will include both required components and regular fields
+    }
+
+    return {
+      requiredComponents,
+      form,
+      handleSave,
+      handleSubmit
+    }
+  }
+}
+</script>
+```
+
+## Component Props
+
+### FormBuilder Props
+
+#### `requiredComponents`
 
 - **Type**: `Array`
 - **Default**: `[]`
 - **Description**: An array of component objects that will always be visible and cannot be modified
+
+### FormPreview Props
+
+#### `requiredComponents`
+
+- **Type**: `Array`
+- **Default**: `[]`
+- **Description**: An array of component objects that will be displayed in the preview alongside regular form fields
+
+**Note**: When using FormPreview, you must pass the same `requiredComponents` array that you used in FormBuilder to ensure consistent display and functionality.
 
 ### Component Object Structure
 
@@ -111,6 +201,13 @@ Each component in the `requiredComponents` array should have the following struc
 - Required components work alongside regular draggable components
 - Regular components can still be added, edited, and deleted normally
 - The form maintains proper layout with both types of components
+
+### FormPreview Integration
+- FormPreview component fully supports required components when the `requiredComponents` prop is provided
+- Required components are displayed with the same blue background and visual distinction as in FormBuilder
+- Form validation includes both required components and regular fields
+- Form submission data includes values from both required components and regular fields
+- Required components are properly initialized with default values if specified
 
 ## Use Cases
 
@@ -187,9 +284,114 @@ const requiredComponents = [
 - Regular components get an `isRequiredComponent: false` flag
 - Different styling and behavior are applied based on this flag
 
-### Form Export
-When exporting form code, required components are included in the generated form structure and are marked as required fields in the validation rules.
+### Technical Implementation
+The required components feature is implemented using a computed property that combines required components with regular form fields:
+
+```javascript
+const allFields = computed(() => {
+  const combined = []
+
+  // Add required components first (marked as required and non-editable)
+  if (props.requiredComponents && props.requiredComponents.length > 0) {
+    props.requiredComponents.forEach((component, index) => {
+      combined.push({
+        ...component,
+        required: true,
+        isRequiredComponent: true,
+        requiredIndex: index
+      })
+    })
+  }
+
+  // Add regular form fields
+  if (currentForm.value.fields && currentForm.value.fields.length > 0) {
+    currentForm.value.fields.forEach((field, index) => {
+      combined.push({
+        ...field,
+        isRequiredComponent: false,
+        regularIndex: index
+      })
+    })
+  }
+
+  return combined
+})
+```
+
+### Recent Fixes and Improvements
+Version 0.6.0 introduced several important fixes to ensure required components work correctly across all features:
+
+#### FormBuilder Fixes
+- **Export Functions**: All export functions (`generateFormCode`, `generateJsonCode`, `generateHtmlCode`) now use `allFields` instead of just `currentForm.fields`
+- **Validation Rules**: Form validation now includes required components in the generated validation rules
+- **Form Data**: Generated form data initialization includes required components
+
+#### FormPreview Fixes
+- **Added Support**: FormPreview now accepts a `requiredComponents` prop
+- **Combined Fields**: FormPreview uses the same `allFields` computed property pattern
+- **Form Initialization**: Form data initialization includes required components
+- **Validation**: Form validation processes both required components and regular fields
+- **Visual Display**: Required components are displayed with proper styling and "Required" badges
+
+### Form Export and Code Generation
+
+Required components are fully integrated into all export formats provided by the FormBuilder component:
+
+#### Vue/Nuxt Component Export
+- Required components are included in the generated Vue component template
+- Validation rules are automatically created for required components
+- Form data initialization includes required components
+- All required components are marked as required in the validation logic
+
+#### JSON Export
+- The exported JSON includes both regular fields and required components
+- Required components are preserved with their `isRequiredComponent` flag
+- The JSON structure maintains the distinction between required and regular components
+- Perfect for importing forms that need to maintain required component definitions
+
+#### HTML Export
+- Required components are rendered in the HTML form structure
+- Required components appear first in the form layout
+- HTML validation attributes are properly set for required components
+- Styling is preserved to maintain visual distinction
+
+#### Export Functionality Fixes
+Recent updates have resolved issues where required components were not being included in exports:
+
+- **Fixed**: `generateFormCode()` now processes all fields (required + regular) instead of just regular fields
+- **Fixed**: `generateJsonCode()` now includes required components in the exported JSON structure
+- **Fixed**: `generateHtmlCode()` now renders required components in the HTML output
+- **Enhanced**: All export formats now properly handle validation rules for required components
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### Required Components Not Appearing in FormPreview
+**Problem**: Required components are not visible in the FormPreview component.
+**Solution**: Ensure you're passing the `requiredComponents` prop to both FormBuilder and FormPreview components with the same array.
+
+```vue
+<!-- Correct usage -->
+<FormBuilder :required-components="requiredComponents" :initial-form="form" />
+<FormPreview :form="form" :required-components="requiredComponents" />
+```
+
+#### Required Components Missing from Exported Code
+**Problem**: Exported form code doesn't include required components.
+**Solution**: This issue was resolved in version 0.6.0. Ensure you're using the latest version of the library.
+
+#### Form Validation Not Working for Required Components
+**Problem**: Form validation doesn't validate required components.
+**Solution**: Make sure you're using FormPreview with the `requiredComponents` prop. The validation system automatically includes required components when this prop is provided.
+
+### Best Practices
+
+1. **Consistent Props**: Always pass the same `requiredComponents` array to both FormBuilder and FormPreview
+2. **Unique Keys**: Ensure each required component has a unique `key` property
+3. **Proper Structure**: Follow the documented component object structure for required components
+4. **Version Compatibility**: Use version 0.6.0 or later for full required components support
 
 ## Backward Compatibility
 
-This feature is fully backward compatible. Existing forms without the `requiredComponents` prop will continue to work exactly as before.
+This feature is fully backward compatible. Existing forms without the `requiredComponents` prop will continue to work exactly as before. The addition of required components support does not affect existing functionality or require any changes to existing implementations.
