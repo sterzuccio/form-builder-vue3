@@ -10,7 +10,7 @@ Repository git: [form-builder-vue3](https://github.com/sterzuccio/form-builder-v
 - **Tailwind CSS**: Modern, responsive UI with Tailwind CSS
 - **Drag and Drop Form Building**: Easily build forms by dragging and dropping components
 - **Live Preview**: Preview your form as you build it
-- **Multiple Export Formats**: Export forms as Vue/Nuxt components, JSON (importable), or embeddable HTML
+- **Multiple Export Formats**: Export forms as Vue/Nuxt components, JSON (importable), embeddable HTML, or JavaScript (head script)
 - **Form Saving**: Save forms in JSON format for easy maintenance
 - **Component Selection**: Choose which components to use when instantiating the library
 - **Endpoint Configuration**: Configure endpoints, HTTP methods, and custom headers
@@ -305,7 +305,7 @@ export default {
 - Required components appear first in the form and have a distinctive blue background
 - They display a "Required" badge and cannot be edited or deleted by users
 - They work alongside regular draggable components in both FormBuilder and FormPreview
-- Fully integrated with form export functionality (Vue, JSON, HTML formats)
+- Fully integrated with form export functionality (Vue, JSON, HTML, JavaScript formats)
 - Form validation and submission includes required components
 - Perfect for mandatory fields, system requirements, or compliance needs
 
@@ -316,6 +316,60 @@ export default {
 - Improved visual consistency between FormBuilder and FormPreview
 
 For detailed usage examples and advanced configurations, see the [Required Components Documentation](documentation/REQUIRED_COMPONENTS_FEATURE.md).
+
+## JavaScript Export Feature
+
+The FormBuilder now supports exporting forms as JavaScript code that can be embedded directly in HTML pages. This feature generates a self-contained script that can be inserted into the `<head>` section of any HTML page to dynamically load and render forms.
+
+### Key Features
+
+- **Self-contained**: Generated JavaScript includes all necessary CSS and functionality
+- **Dynamic loading**: Forms can be loaded from external endpoints or embedded directly
+- **Automatic styling**: Includes responsive CSS styling that works without external dependencies
+- **Form validation**: Built-in client-side validation for required fields
+- **Flexible integration**: Can be loaded into any HTML container element
+- **Backend integration**: Supports dynamic form loading from server endpoints
+
+### Basic Usage
+
+1. **Export JavaScript Code**: Select "JavaScript (Head Script)" from the export format dropdown in FormBuilder
+2. **Configure Endpoint** (Optional): Set a form endpoint URL in the JavaScript Configuration section
+3. **Embed in HTML**: Add the generated script to your HTML page's `<head>` section
+4. **Add Container**: Include a container element where the form should appear
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Your generated JavaScript code goes here -->
+    <script>
+        // Generated FormBuilder JavaScript code
+    </script>
+</head>
+<body>
+    <!-- Form will be automatically loaded into this container -->
+    <div id="dynamic-form-container"></div>
+
+    <!-- Or load into a custom container -->
+    <div id="my-custom-form"></div>
+    <script>
+        // Load form into custom container
+        DynamicFormLoader.load('my-custom-form');
+    </script>
+</body>
+</html>
+```
+
+### Backend Integration
+
+The JavaScript export feature supports loading form configurations dynamically from backend endpoints. This allows you to:
+
+- Store form configurations on your server
+- Update forms without regenerating JavaScript code
+- Implement form versioning and management
+- Use custom headers for authentication
+
+For detailed implementation guidance, see the [JavaScript Export Documentation](documentation/JAVASCRIPT_EXPORT.md).
 
 ## Component Props
 
@@ -331,7 +385,7 @@ For detailed usage examples and advanced configurations, see the [Required Compo
 | showComponentSelector | Boolean | `true` | Whether to show the component selector |
 | showFormSettings | Boolean | `true` | Whether to show form settings |
 | showFormName | Boolean | `true` | Whether to show form name input |
-| exportFormats | Array | `[{ value: 'vue', label: 'Vue/Nuxt Component' }, { value: 'json', label: 'JSON (Importable)' }, { value: 'html', label: 'Embeddable HTML' }]` | Available export formats |
+| exportFormats | Array | `[{ value: 'vue', label: 'Vue/Nuxt Component' }, { value: 'json', label: 'JSON (Importable)' }, { value: 'html', label: 'Embeddable HTML' }, { value: 'js', label: 'JavaScript (Head Script)' }]` | Available export formats |
 | color | String \| Object | `'indigo'` | Color theme for the component. Accepts any Tailwind CSS color name (e.g., 'blue', 'green', 'red', 'purple', etc.) or a custom color object with all required shades. See [Custom Colors Documentation](documentation/CUSTOM_COLORS.md) for object format. |
 
 ### FormPreview
@@ -388,7 +442,7 @@ Each field in the form has the following properties:
 ### FormBuilder Methods
 
 - `saveForm()`: Saves the form to the store and emits the 'save' event
-- `exportFormCode()`: Generates the form code based on the selected export format (Vue/Nuxt, JSON, or HTML), displays it in a modal, and emits the 'export' event
+- `exportFormCode()`: Generates the form code based on the selected export format (Vue/Nuxt, JSON, HTML, or JavaScript), displays it in a modal, and emits the 'export' event
 - `getFormCode()`: Generates the Vue/Nuxt form code without displaying the modal, emits the 'get-form-code' event, and returns the code
 
 ## Development

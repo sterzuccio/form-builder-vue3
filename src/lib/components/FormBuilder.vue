@@ -179,6 +179,22 @@
               {{ addHeaderButtonText }}
             </button>
           </div>
+
+          <!-- JavaScript Configuration Section -->
+          <div v-if="showJsConfig && selectedExportFormat === 'js'" class="border-t pt-4">
+            <h4 class="text-md font-medium text-gray-900 mb-3">{{ jsConfigTitle }}</h4>
+            <div>
+              <label for="js-endpoint" class="block text-sm font-medium text-gray-700">{{ jsEndpointLabel }}</label>
+              <input 
+                type="text" 
+                id="js-endpoint" 
+                v-model="jsEndpointUrl" 
+                :class="`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none ${colorClasses.focusRing} ${colorClasses.focusBorder} sm:text-sm`"
+                :placeholder="jsEndpointPlaceholder"
+              >
+              <p class="mt-1 text-xs text-gray-500">{{ jsEndpointHelp }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -522,6 +538,10 @@ export default {
       type: Boolean,
       default: true
     },
+    showJsConfig: {
+      type: Boolean,
+      default: true
+    },
     // Text customization
     componentSelectorTitle: {
       type: String,
@@ -590,6 +610,22 @@ export default {
     addHeaderButtonText: {
       type: String,
       default: 'Add Header'
+    },
+    jsConfigTitle: {
+      type: String,
+      default: 'JavaScript Configuration'
+    },
+    jsEndpointLabel: {
+      type: String,
+      default: 'Form Endpoint URL'
+    },
+    jsEndpointPlaceholder: {
+      type: String,
+      default: 'https://api.example.com/forms/your-form-id'
+    },
+    jsEndpointHelp: {
+      type: String,
+      default: 'URL that returns the form configuration JSON'
     },
     editModalTitle: {
       type: String,
@@ -701,7 +737,8 @@ export default {
       default: () => [
         { value: 'vue', label: 'Vue/Nuxt Component' },
         { value: 'json', label: 'JSON (Importable)' },
-        { value: 'html', label: 'Embeddable HTML' }
+        { value: 'html', label: 'Embeddable HTML' },
+        { value: 'js', label: 'JavaScript (Head Script)' }
       ]
     },
     storeModuleName: {
@@ -802,6 +839,9 @@ export default {
 
     // Form data
     const currentForm = ref({ ...props.initialForm })
+
+    // JavaScript configuration
+    const jsEndpointUrl = ref('')
 
     // Watch for changes to initialForm prop
     watch(() => props.initialForm, (newForm) => {
@@ -1360,6 +1400,9 @@ export default {
         case 'html':
           exportedCode.value = generateHtmlCode()
           break
+        case 'js':
+          exportedCode.value = generateJsCode()
+          break
         default:
           exportedCode.value = generateFormCode()
       }
@@ -1492,6 +1535,469 @@ export default {
   <\/script>
 <\/body>
 <\/html>`
+    }
+
+    // Generate JavaScript code for HTML head insertion
+    const generateJsCode = () => {
+      const formFields = allFields.value.map(field => {
+        return generateJsFieldCode(field)
+      }).join(',\n      ')
+
+      const formConfig = {
+        name: currentForm.value.name || 'Generated Form',
+        endpoint: currentForm.value.endpoint || '',
+        method: currentForm.value.method || 'POST',
+        headers: currentForm.value.headers || {},
+        fields: allFields.value,
+        jsEndpoint: jsEndpointUrl.value || ''
+      }
+
+      return `(function() {
+  'use strict';
+
+  // Form configuration
+  const formConfig = ${JSON.stringify(formConfig, null, 2)};
+
+  // CSS styles for the form
+  const formStyles = \`
+    .dynamic-form {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .dynamic-form .form-group {
+      margin-bottom: 1rem;
+    }
+    .dynamic-form .form-group-half {
+      width: 48%;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 2%;
+    }
+    .dynamic-form .form-group-full {
+      width: 100%;
+      clear: both;
+    }
+    .dynamic-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .dynamic-form input, .dynamic-form select, .dynamic-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .dynamic-form input[type="checkbox"], .dynamic-form input[type="radio"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    .dynamic-form .checkbox-label, .dynamic-form .radio-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .dynamic-form button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .dynamic-form button:hover {
+      background-color: #4338ca;
+    }
+    .dynamic-form .error {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    .dynamic-form .success {
+      color: #059669;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  \`;
+
+  // Inject CSS styles
+  function injectStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = formStyles;
+    document.head.appendChild(styleElement);
+  }
+
+  // Generate field HTML
+  function generateFieldHTML(field) {
+    const fieldName = field.key || field.name || field.type + field.label.replace(/\\s+/g, '');
+    const requiredAttr = field.required ? ' required' : '';
+    const errorDiv = \`<div id="\${fieldName}-error" class="error"></div>\`;
+    const widthClass = field.width === 'half' ? 'form-group-half' : 'form-group-full';
+
+    switch (field.type) {
+      case 'text':
+      case 'email':
+      case 'password':
+      case 'number':
+      case 'date':
+        return \`<div class="form-group \${widthClass}">
+          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
+          <input 
+            type="\${field.type}" 
+            id="\${fieldName}" 
+            name="\${fieldName}"
+            placeholder="\${field.placeholder || ''}"
+            \${requiredAttr}
+          >
+          \${errorDiv}
+        </div>\`;
+
+      case 'textarea':
+        return \`<div class="form-group \${widthClass}">
+          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
+          <textarea 
+            id="\${fieldName}" 
+            name="\${fieldName}"
+            placeholder="\${field.placeholder || ''}"
+            \${requiredAttr}
+          ></textarea>
+          \${errorDiv}
+        </div>\`;
+
+      case 'select':
+        const selectOptions = field.options.map(option => 
+          \`<option value="\${option.value}">\${option.label}</option>\`
+        ).join('');
+        return \`<div class="form-group \${widthClass}">
+          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
+          <select 
+            id="\${fieldName}" 
+            name="\${fieldName}"
+            \${requiredAttr}
+          >
+            <option value="" disabled selected>Select an option</option>
+            \${selectOptions}
+          </select>
+          \${errorDiv}
+        </div>\`;
+
+      case 'radio':
+        const radioOptions = field.options.map((option, index) => \`
+          <div class="radio-label">
+            <input 
+              type="radio" 
+              id="\${fieldName}_\${index}" 
+              name="\${fieldName}" 
+              value="\${option.value}"
+              \${index === 0 && field.required ? requiredAttr : ''}
+            >
+            <label for="\${fieldName}_\${index}">\${option.label}</label>
+          </div>\`).join('');
+        return \`<div class="form-group \${widthClass}">
+          <label>\${field.label}\${field.required ? ' *' : ''}</label>
+          \${radioOptions}
+          \${errorDiv}
+        </div>\`;
+
+      case 'checkbox':
+        if (field.options && field.options.length > 1) {
+          const checkboxOptions = field.options.map((option, index) => \`
+            <div class="checkbox-label">
+              <input 
+                type="checkbox" 
+                id="\${fieldName}_\${index}" 
+                name="\${fieldName}[]" 
+                value="\${option.value}"
+              >
+              <label for="\${fieldName}_\${index}">\${option.label}</label>
+            </div>\`).join('');
+          return \`<div class="form-group \${widthClass}">
+            <label>\${field.label}\${field.required ? ' *' : ''}</label>
+            \${checkboxOptions}
+            \${errorDiv}
+          </div>\`;
+        } else {
+          return \`<div class="form-group checkbox-label \${widthClass}">
+            <input 
+              type="checkbox" 
+              id="\${fieldName}" 
+              name="\${fieldName}"
+              \${requiredAttr}
+            >
+            <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
+            \${errorDiv}
+          </div>\`;
+        }
+
+      default:
+        return \`<div class="form-group \${widthClass}">
+          <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
+          <input 
+            type="text" 
+            id="\${fieldName}" 
+            name="\${fieldName}"
+            placeholder="\${field.placeholder || ''}"
+            \${requiredAttr}
+          >
+          \${errorDiv}
+        </div>\`;
+    }
+  }
+
+  // Create form HTML
+  function createFormHTML() {
+    const fieldsHTML = formConfig.fields.map(field => generateFieldHTML(field)).join('');
+
+    return \`
+      <div class="dynamic-form">
+        <form id="dynamicForm" method="\${formConfig.method}">
+          <h2>\${formConfig.name}</h2>
+          \${fieldsHTML}
+          <div class="form-group">
+            <button type="submit">Submit</button>
+          </div>
+          <div id="form-message"></div>
+        </form>
+      </div>
+    \`;
+  }
+
+  // Form validation
+  function validateForm(form) {
+    let isValid = true;
+    const requiredFields = form.querySelectorAll('[required]');
+
+    // Clear previous errors
+    form.querySelectorAll('.error').forEach(error => error.textContent = '');
+
+    requiredFields.forEach(field => {
+      const errorElement = document.getElementById(field.id + '-error');
+      if (!field.value.trim()) {
+        isValid = false;
+        if (errorElement) {
+          errorElement.textContent = 'This field is required';
+        }
+      }
+    });
+
+    return isValid;
+  }
+
+  // Submit form
+  function submitForm(formData) {
+    const messageDiv = document.getElementById('form-message');
+
+    if (!formConfig.endpoint) {
+      messageDiv.innerHTML = '<div class="error">No endpoint configured for form submission</div>';
+      return;
+    }
+
+    fetch(formConfig.endpoint, {
+      method: formConfig.method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...formConfig.headers
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      if (response.ok) {
+        messageDiv.innerHTML = '<div class="success">Form submitted successfully!</div>';
+        document.getElementById('dynamicForm').reset();
+      } else {
+        throw new Error('Form submission failed');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      messageDiv.innerHTML = '<div class="error">Error submitting form. Please try again.</div>';
+    });
+  }
+
+  // Initialize form
+  function initForm(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error('Container element not found:', containerId);
+      return;
+    }
+
+    // Inject styles
+    injectStyles();
+
+    // Create form HTML
+    container.innerHTML = createFormHTML();
+
+    // Add form submission handler
+    const form = document.getElementById('dynamicForm');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!validateForm(form)) {
+        return;
+      }
+
+      // Collect form data
+      const formData = new FormData(form);
+      const data = {};
+
+      for (let [key, value] of formData.entries()) {
+        if (data[key]) {
+          // Handle multiple values (checkboxes)
+          if (Array.isArray(data[key])) {
+            data[key].push(value);
+          } else {
+            data[key] = [data[key], value];
+          }
+        } else {
+          data[key] = value;
+        }
+      }
+
+      submitForm(data);
+    });
+  }
+
+  // Load form configuration from endpoint
+  function loadFromEndpoint(containerId, endpointUrl, formId, customHeaders = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error('Container element not found:', containerId);
+      return;
+    }
+
+    // Show loading message
+    container.innerHTML = '<div class="dynamic-form"><div style="text-align: center; padding: 2rem;">Loading form...</div></div>';
+
+    // Construct the URL with form ID if provided
+    const url = formId ? \`\${endpointUrl}/\${formId}\` : endpointUrl;
+
+    // Prepare headers
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...customHeaders
+    };
+
+    fetch(url, {
+      method: 'GET',
+      headers: headers
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(\`HTTP error! status: \${response.status}\`);
+      }
+      return response.json();
+    })
+    .then(config => {
+      // Update formConfig with loaded data
+      Object.assign(formConfig, config);
+
+      // Initialize form with new configuration
+      initForm(containerId);
+    })
+    .catch(error => {
+      console.error('Error loading form configuration:', error);
+      container.innerHTML = \`
+        <div class="dynamic-form">
+          <div class="error" style="text-align: center; padding: 2rem;">
+            Error loading form: \${error.message}
+          </div>
+        </div>
+      \`;
+    });
+  }
+
+  // Load form by ID from configured endpoint
+  function loadFormById(containerId, formId, customHeaders = {}) {
+    if (!formConfig.jsEndpoint) {
+      console.error('No jsEndpoint configured for dynamic form loading');
+      return;
+    }
+
+    loadFromEndpoint(containerId, formConfig.jsEndpoint, formId, customHeaders);
+  }
+
+  // Public API
+  window.DynamicFormLoader = {
+    load: initForm,
+    loadFromEndpoint: loadFromEndpoint,
+    loadFormById: loadFormById,
+    config: formConfig
+  };
+
+  // Auto-load if container exists
+  document.addEventListener('DOMContentLoaded', function() {
+    const defaultContainer = document.getElementById('dynamic-form-container');
+    if (defaultContainer) {
+      // Check if form ID is specified in data attribute
+      const formId = defaultContainer.getAttribute('data-form-id');
+      const customHeaders = {};
+
+      // Check for custom headers in data attributes
+      Array.from(defaultContainer.attributes).forEach(attr => {
+        if (attr.name.startsWith('data-header-')) {
+          const headerName = attr.name.replace('data-header-', '').replace(/-/g, '-');
+          customHeaders[headerName] = attr.value;
+        }
+      });
+
+      if (formId && formConfig.jsEndpoint) {
+        loadFormById('dynamic-form-container', formId, customHeaders);
+      } else {
+        initForm('dynamic-form-container');
+      }
+    }
+  });
+
+})();
+
+// Usage:
+// 1. Add this script to your HTML head
+// 2. Add <div id="dynamic-form-container"></div> where you want the form to appear
+// 3. Or call DynamicFormLoader.load('your-container-id') to load into a specific container
+// 
+// Advanced Usage with Backend Integration:
+// 1. Static form loading:
+//    DynamicFormLoader.load('container-id')
+// 
+// 2. Load from custom endpoint:
+//    DynamicFormLoader.loadFromEndpoint('container-id', 'https://api.example.com/forms', 'form-123')
+// 
+// 3. Load by form ID using configured jsEndpoint:
+//    DynamicFormLoader.loadFormById('container-id', 'contact-form')
+// 
+// 4. Auto-load with form ID using data attributes:
+//    <div id="dynamic-form-container" 
+//         data-form-id="contact-form"
+//         data-header-x-api-key="your-api-key"
+//         data-header-authorization="Bearer token"></div>
+// 
+// Backend Endpoint Requirements:
+// - GET /api/forms/{formId} should return JSON with form configuration
+// - Response format should match the formConfig structure
+// - Include fields array, endpoint, method, headers, etc.`
+    }
+
+    // Generate JavaScript field code helper
+    const generateJsFieldCode = (field) => {
+      return {
+        type: field.type,
+        key: field.key || field.name || field.type + field.label.replace(/\s+/g, ''),
+        label: field.label,
+        placeholder: field.placeholder || '',
+        required: field.required || false,
+        width: field.width || 'full',
+        options: field.options || [],
+        validation: field.validation || {}
+      }
     }
 
     // Generate HTML field code
@@ -1794,6 +2300,7 @@ export default {
       colorClasses,
       headers,
       headerKeys,
+      jsEndpointUrl,
       showFieldModal,
       editingField,
       editingFieldIndex,

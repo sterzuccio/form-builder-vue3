@@ -180,11 +180,13 @@ describe('FormBuilder.vue', () => {
     expect(wrapper.vm.selectedExportFormat).toBe('vue')
 
     // Check that all format options are rendered
-    const options = wrapper.findAll('option')
-    expect(options.length).toBe(3) // vue, json, html
+    const exportSelect = wrapper.find('select')
+    const options = exportSelect.findAll('option')
+    expect(options.length).toBe(4) // vue, json, html, js
     expect(options[0].text()).toBe('Vue/Nuxt Component')
     expect(options[1].text()).toBe('JSON (Importable)')
     expect(options[2].text()).toBe('Embeddable HTML')
+    expect(options[3].text()).toBe('JavaScript (Head Script)')
   })
 
   it('supports custom fields', () => {
@@ -274,6 +276,18 @@ describe('FormBuilder.vue', () => {
     expect(wrapper.vm.exportedCode).toContain('<!DOCTYPE html>')
     expect(wrapper.vm.exportedCode).toContain('<html')
     expect(wrapper.emitted().export.length).toBe(3)
+
+    // Reset modal
+    wrapper.vm.closeExportModal()
+
+    // Test JavaScript format
+    wrapper.vm.selectedExportFormat = 'js'
+    await wrapper.find('button').trigger('click')
+    expect(wrapper.vm.showExportModal).toBe(true)
+    expect(wrapper.vm.exportedCode).toContain('(function()')
+    expect(wrapper.vm.exportedCode).toContain('DynamicFormLoader')
+    expect(wrapper.vm.exportedCode).toContain('formConfig')
+    expect(wrapper.emitted().export.length).toBe(4)
   })
 
   describe('Color functionality', () => {
