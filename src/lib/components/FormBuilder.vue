@@ -20,7 +20,7 @@
       </div>
 
       <!-- Main Content - Form Builder -->
-      <div :class="mainContentClass">
+      <div class="md:col-span-2 bg-white shadow rounded-lg p-4">
         <div class="flex justify-between items-center mb-4">
           <div v-if="showFormName">
             <label :for="formNameId" class="block text-sm font-medium text-gray-700">{{ formNameLabel }}</label>
@@ -838,16 +838,6 @@ export default {
       return components
     })
 
-    // Computed class for main content based on sidebar visibility
-    const mainContentClass = computed(() => {
-      if (!props.showComponentSelector && !props.showFormSettings) {
-        return 'md:col-span-4 bg-white shadow rounded-lg p-4'
-      } else if (!props.showComponentSelector || !props.showFormSettings) {
-        return 'md:col-span-3 bg-white shadow rounded-lg p-4'
-      } else {
-        return 'md:col-span-2 bg-white shadow rounded-lg p-4'
-      }
-    })
 
     // Color computed properties
     const colorClasses = computed(() => {
@@ -1754,7 +1744,6 @@ export default {
     return {
       currentForm,
       availableComponents,
-      mainContentClass,
       colorClasses,
       headers,
       headerKeys,
