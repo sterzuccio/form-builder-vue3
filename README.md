@@ -18,6 +18,7 @@ Repository git: [form-builder-vue3](https://github.com/sterzuccio/form-builder-v
 - **Customizable Fields**: Customize labels, placeholders, required status, hidden status, field width, and options for select/radio fields
 - **Required Fields**: Support for required fields
 - **Hidden Fields**: Support for hidden fields with default values that are not visible in the form but are included in form submissions
+- **Required Components**: Define components that are always visible, always required, and cannot be modified by users
 - **Color Customization**: Customize component colors using Tailwind CSS color palette (indigo by default)
 - **Comprehensive Tests**: Includes unit and integration tests for all components
 
@@ -233,6 +234,54 @@ The color affects:
 
 In addition to standard Tailwind colors, you can also define custom colors with all the standard Tailwind color shades (50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950). For detailed information on how to use custom colors, see the [Custom Colors Documentation](documentation/CUSTOM_COLORS.md).
 
+### Required Components
+
+The FormBuilder component supports a `requiredComponents` prop that allows you to define components that are always visible, always required, and cannot be modified by users. This is perfect for mandatory fields, system fields, or compliance requirements.
+
+```vue
+<template>
+  <FormBuilder
+    :required-components="requiredComponents"
+    :initial-form="initialForm"
+  />
+</template>
+
+<script>
+export default {
+  setup() {
+    const requiredComponents = [
+      {
+        type: 'text',
+        label: 'Full Name',
+        key: 'fullName',
+        placeholder: 'Enter your full name',
+        required: true,
+        width: 'full'
+      },
+      {
+        type: 'email',
+        label: 'Email Address',
+        key: 'email',
+        placeholder: 'Enter your email',
+        required: true,
+        width: 'half'
+      }
+    ]
+
+    return { requiredComponents }
+  }
+}
+</script>
+```
+
+**Key Features:**
+- Required components appear first in the form and have a distinctive blue background
+- They display a "Required" badge and cannot be edited or deleted by users
+- They work alongside regular draggable components
+- Perfect for mandatory fields, system requirements, or compliance needs
+
+For detailed usage examples and advanced configurations, see the [Required Components Documentation](documentation/REQUIRED_COMPONENTS_FEATURE.md).
+
 ## Component Props
 
 ### FormBuilder
@@ -243,6 +292,7 @@ In addition to standard Tailwind colors, you can also define custom colors with 
 | components | Array | `[]` | Custom components to use |
 | customFields | Array | `[]` | Custom fields that can be added via drag and drop |
 | activeFieldKeys | Array | `[]` | List of field types that should be visible in the component selector. If empty, all fields are shown. |
+| requiredComponents | Array | `[]` | Components that are always visible, always required, and cannot be modified by users. See [Required Components Documentation](documentation/REQUIRED_COMPONENTS_FEATURE.md) for details. |
 | showComponentSelector | Boolean | `true` | Whether to show the component selector |
 | showFormSettings | Boolean | `true` | Whether to show form settings |
 | showFormName | Boolean | `true` | Whether to show form name input |

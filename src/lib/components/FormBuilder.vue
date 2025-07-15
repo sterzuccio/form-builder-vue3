@@ -67,31 +67,37 @@
           @dragover.prevent
           @drop="onDrop"
         >
-          <div v-if="currentForm.fields.length === 0" class="text-center text-gray-500 py-8">
+          <div v-if="allFields.length === 0" class="text-center text-gray-500 py-8">
             {{ emptyFormText }}
           </div>
           <div v-else class="grid grid-cols-2 gap-4">
             <div 
-              v-for="(field, index) in currentForm.fields" 
-              :key="index"
+              v-for="(field, index) in allFields" 
+              :key="field.isRequiredComponent ? `required-${field.requiredIndex}` : `regular-${field.regularIndex}`"
               :class="[
-                'p-4 border rounded-md bg-white hover:bg-gray-50 relative',
+                'p-4 border rounded-md relative',
+                field.isRequiredComponent ? 'bg-blue-50 border-blue-200' : 'bg-white hover:bg-gray-50',
                 field.width === 'half' ? 'col-span-1' : 'col-span-2'
               ]"
             >
               <div class="flex justify-between items-start">
                 <div class="w-full">
                   <div class="flex justify-between mb-2">
-                    <span class="font-medium text-gray-700">{{ getComponentLabel(field.type) }}</span>
-                    <div class="flex space-x-1">
+                    <div class="flex items-center">
+                      <span class="font-medium text-gray-700">{{ getComponentLabel(field.type) }}</span>
+                      <span v-if="field.isRequiredComponent" class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                        Required
+                      </span>
+                    </div>
+                    <div v-if="!field.isRequiredComponent" class="flex space-x-1">
                       <button 
-                        @click="editField(index)" 
+                        @click="editField(field.regularIndex)" 
                         class="text-gray-500 hover:text-gray-700"
                       >
                         {{ editButtonText }}
                       </button>
                       <button 
-                        @click="deleteField(index)" 
+                        @click="deleteField(field.regularIndex)" 
                         class="text-red-500 hover:text-red-700"
                       >
                         {{ deleteButtonText }}
@@ -486,6 +492,11 @@ export default {
       type: Array,
       default: () => []
     },
+    // Required components that are always visible and cannot be modified
+    requiredComponents: {
+      type: Array,
+      default: () => []
+    },
     // UI configuration
     showComponentSelector: {
       type: Boolean,
@@ -838,6 +849,35 @@ export default {
       return components
     })
 
+    // Combined fields (required components + regular fields)
+    const allFields = computed(() => {
+      const combined = []
+
+      // Add required components first (marked as required and non-editable)
+      if (props.requiredComponents && props.requiredComponents.length > 0) {
+        props.requiredComponents.forEach((component, index) => {
+          combined.push({
+            ...component,
+            required: true,
+            isRequiredComponent: true,
+            requiredIndex: index
+          })
+        })
+      }
+
+      // Add regular form fields
+      if (currentForm.value.fields && currentForm.value.fields.length > 0) {
+        currentForm.value.fields.forEach((field, index) => {
+          combined.push({
+            ...field,
+            isRequiredComponent: false,
+            regularIndex: index
+          })
+        })
+      }
+
+      return combined
+    })
 
     // Color computed properties
     const colorClasses = computed(() => {
@@ -1744,6 +1784,7 @@ export default {
     return {
       currentForm,
       availableComponents,
+      allFields,
       colorClasses,
       headers,
       headerKeys,
