@@ -1,9 +1,27 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   safelist: [
+    // Grid layout classes for FormBuilder component
+    'grid',
+    'grid-cols-1',
+    'grid-cols-2',
+    'grid-cols-4',
+    'md:grid-cols-1',
+    'md:grid-cols-2',
+    'md:grid-cols-4',
+    'col-span-1',
+    'col-span-2',
+    'col-span-4',
+    'md:col-span-1',
+    'md:col-span-2',
+    'md:col-span-4',
+    'gap-4',
+    'gap-6',
+
     // Dynamic color classes for FormBuilder component
     // Generate explicit class names for all supported colors
 
