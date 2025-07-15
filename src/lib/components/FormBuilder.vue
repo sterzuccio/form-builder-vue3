@@ -680,10 +680,6 @@ export default {
       type: String,
       default: 'Are you sure you want to delete this field? This action cannot be undone.'
     },
-    deleteButtonText: {
-      type: String,
-      default: 'Delete'
-    },
     // Other configuration
     httpMethods: {
       type: Array,
