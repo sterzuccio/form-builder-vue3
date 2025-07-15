@@ -181,36 +181,20 @@ Your endpoint should return a JSON object with this structure:
 
 ### Dynamic Form Loading
 
-The generated JavaScript provides methods to load forms dynamically:
+The generated JavaScript provides a simple method to load forms:
 
 ```javascript
 // Load form into a specific container
-DynamicFormLoader.load('my-form-container');
-
-// Load form from endpoint with form ID
-DynamicFormLoader.loadFromEndpoint('container-id', 'https://api.example.com/forms', 'contact-form');
-
-// Load form by ID using configured jsEndpoint
-DynamicFormLoader.loadFormById('container-id', 'contact-form');
-
-// Load form with custom headers (for authentication)
-DynamicFormLoader.loadFormById('container-id', 'secure-form', {
-    'Authorization': 'Bearer your-token',
-    'X-API-Key': 'your-api-key'
-});
+FormLoader.load('my-form-container');
 ```
 
-### HTML Data Attributes
+### Loading from Endpoint
 
-You can configure form loading using HTML data attributes:
+If you configure a "Form Endpoint URL" in the FormBuilder's JavaScript Configuration section, the script will automatically download the form configuration from that endpoint when the page loads:
 
-```html
-<!-- Auto-load form by ID with custom headers -->
-<div id="dynamic-form-container" 
-     data-form-id="contact-form"
-     data-header-authorization="Bearer your-token"
-     data-header-x-api-key="your-api-key">
-</div>
+```javascript
+// The form will automatically load from the configured endpoint
+// No additional code needed - just include the container div
 ```
 
 ### Backend Implementation Example

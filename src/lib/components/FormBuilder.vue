@@ -1539,10 +1539,6 @@ export default {
 
     // Generate JavaScript code for HTML head insertion
     const generateJsCode = () => {
-      const formFields = allFields.value.map(field => {
-        return generateJsFieldCode(field)
-      }).join(',\n      ')
-
       const formConfig = {
         name: currentForm.value.name || 'Generated Form',
         endpoint: currentForm.value.endpoint || '',
@@ -1555,8 +1551,8 @@ export default {
       return `(function() {
   'use strict';
 
-  // Form configuration
-  const formConfig = ${JSON.stringify(formConfig, null, 2)};
+  // Form configuration - can be loaded from endpoint if jsEndpoint is provided
+  let formConfig = ${JSON.stringify(formConfig, null, 2)};
 
   // CSS styles for the form
   const formStyles = \`
@@ -1629,9 +1625,12 @@ export default {
 
   // Inject CSS styles
   function injectStyles() {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = formStyles;
-    document.head.appendChild(styleElement);
+    if (!document.getElementById('dynamic-form-styles')) {
+      const styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-form-styles';
+      styleElement.textContent = formStyles;
+      document.head.appendChild(styleElement);
+    }
   }
 
   // Generate field HTML
@@ -1672,9 +1671,9 @@ export default {
         </div>\`;
 
       case 'select':
-        const selectOptions = field.options.map(option => 
+        const selectOptions = field.options ? field.options.map(option => 
           \`<option value="\${option.value}">\${option.label}</option>\`
-        ).join('');
+        ).join('') : '';
         return \`<div class="form-group \${widthClass}">
           <label for="\${fieldName}">\${field.label}\${field.required ? ' *' : ''}</label>
           <select 
@@ -1689,7 +1688,7 @@ export default {
         </div>\`;
 
       case 'radio':
-        const radioOptions = field.options.map((option, index) => \`
+        const radioOptions = field.options ? field.options.map((option, index) => \`
           <div class="radio-label">
             <input 
               type="radio" 
@@ -1699,7 +1698,7 @@ export default {
               \${index === 0 && field.required ? requiredAttr : ''}
             >
             <label for="\${fieldName}_\${index}">\${option.label}</label>
-          </div>\`).join('');
+          </div>\`).join('') : '';
         return \`<div class="form-group \${widthClass}">
           <label>\${field.label}\${field.required ? ' *' : ''}</label>
           \${radioOptions}
@@ -1799,6 +1798,8 @@ export default {
       return;
     }
 
+    messageDiv.innerHTML = '<div style="color: #6b7280;">Submitting...</div>';
+
     fetch(formConfig.endpoint, {
       method: formConfig.method,
       headers: {
@@ -1821,8 +1822,48 @@ export default {
     });
   }
 
-  // Initialize form
-  function initForm(containerId) {
+  // Load and embed form
+  function loadForm(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error('Container element not found:', containerId);
+      return;
+    }
+
+    // If jsEndpoint is configured, download form configuration first
+    if (formConfig.jsEndpoint) {
+      container.innerHTML = '<div class="dynamic-form"><div style="text-align: center; padding: 2rem; color: #6b7280;">Loading form...</div></div>';
+
+      fetch(formConfig.jsEndpoint)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load form configuration');
+          }
+          return response.json();
+        })
+        .then(config => {
+          // Update form configuration with downloaded data
+          formConfig = { ...formConfig, ...config };
+          embedForm(containerId);
+        })
+        .catch(error => {
+          console.error('Error loading form:', error);
+          container.innerHTML = \`
+            <div class="dynamic-form">
+              <div class="error" style="text-align: center; padding: 2rem;">
+                Error loading form. Please try again later.
+              </div>
+            </div>
+          \`;
+        });
+    } else {
+      // Use embedded configuration
+      embedForm(containerId);
+    }
+  }
+
+  // Embed form in container
+  function embedForm(containerId) {
     const container = document.getElementById(containerId);
     if (!container) {
       console.error('Container element not found:', containerId);
@@ -1837,153 +1878,55 @@ export default {
 
     // Add form submission handler
     const form = document.getElementById('dynamicForm');
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-      if (!validateForm(form)) {
-        return;
-      }
+        if (!validateForm(form)) {
+          return;
+        }
 
-      // Collect form data
-      const formData = new FormData(form);
-      const data = {};
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {};
 
-      for (let [key, value] of formData.entries()) {
-        if (data[key]) {
-          // Handle multiple values (checkboxes)
-          if (Array.isArray(data[key])) {
-            data[key].push(value);
+        for (let [key, value] of formData.entries()) {
+          if (data[key]) {
+            // Handle multiple values (checkboxes)
+            if (Array.isArray(data[key])) {
+              data[key].push(value);
+            } else {
+              data[key] = [data[key], value];
+            }
           } else {
-            data[key] = [data[key], value];
+            data[key] = value;
           }
-        } else {
-          data[key] = value;
         }
-      }
 
-      submitForm(data);
-    });
-  }
-
-  // Load form configuration from endpoint
-  function loadFromEndpoint(containerId, endpointUrl, formId, customHeaders = {}) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-      console.error('Container element not found:', containerId);
-      return;
-    }
-
-    // Show loading message
-    container.innerHTML = '<div class="dynamic-form"><div style="text-align: center; padding: 2rem;">Loading form...</div></div>';
-
-    // Construct the URL with form ID if provided
-    const url = formId ? \`\${endpointUrl}/\${formId}\` : endpointUrl;
-
-    // Prepare headers
-    const headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      ...customHeaders
-    };
-
-    fetch(url, {
-      method: 'GET',
-      headers: headers
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(\`HTTP error! status: \${response.status}\`);
-      }
-      return response.json();
-    })
-    .then(config => {
-      // Update formConfig with loaded data
-      Object.assign(formConfig, config);
-
-      // Initialize form with new configuration
-      initForm(containerId);
-    })
-    .catch(error => {
-      console.error('Error loading form configuration:', error);
-      container.innerHTML = \`
-        <div class="dynamic-form">
-          <div class="error" style="text-align: center; padding: 2rem;">
-            Error loading form: \${error.message}
-          </div>
-        </div>
-      \`;
-    });
-  }
-
-  // Load form by ID from configured endpoint
-  function loadFormById(containerId, formId, customHeaders = {}) {
-    if (!formConfig.jsEndpoint) {
-      console.error('No jsEndpoint configured for dynamic form loading');
-      return;
-    }
-
-    loadFromEndpoint(containerId, formConfig.jsEndpoint, formId, customHeaders);
-  }
-
-  // Public API
-  window.DynamicFormLoader = {
-    load: initForm,
-    loadFromEndpoint: loadFromEndpoint,
-    loadFormById: loadFormById,
-    config: formConfig
-  };
-
-  // Auto-load if container exists
-  document.addEventListener('DOMContentLoaded', function() {
-    const defaultContainer = document.getElementById('dynamic-form-container');
-    if (defaultContainer) {
-      // Check if form ID is specified in data attribute
-      const formId = defaultContainer.getAttribute('data-form-id');
-      const customHeaders = {};
-
-      // Check for custom headers in data attributes
-      Array.from(defaultContainer.attributes).forEach(attr => {
-        if (attr.name.startsWith('data-header-')) {
-          const headerName = attr.name.replace('data-header-', '').replace(/-/g, '-');
-          customHeaders[headerName] = attr.value;
-        }
+        submitForm(data);
       });
+    }
+  }
 
-      if (formId && formConfig.jsEndpoint) {
-        loadFormById('dynamic-form-container', formId, customHeaders);
-      } else {
-        initForm('dynamic-form-container');
-      }
+  // Auto-load form when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('dynamic-form-container');
+    if (container) {
+      loadForm('dynamic-form-container');
     }
   });
+
+  // Simple public API
+  window.FormLoader = {
+    load: loadForm
+  };
 
 })();
 
 // Usage:
 // 1. Add this script to your HTML head
 // 2. Add <div id="dynamic-form-container"></div> where you want the form to appear
-// 3. Or call DynamicFormLoader.load('your-container-id') to load into a specific container
-// 
-// Advanced Usage with Backend Integration:
-// 1. Static form loading:
-//    DynamicFormLoader.load('container-id')
-// 
-// 2. Load from custom endpoint:
-//    DynamicFormLoader.loadFromEndpoint('container-id', 'https://api.example.com/forms', 'form-123')
-// 
-// 3. Load by form ID using configured jsEndpoint:
-//    DynamicFormLoader.loadFormById('container-id', 'contact-form')
-// 
-// 4. Auto-load with form ID using data attributes:
-//    <div id="dynamic-form-container" 
-//         data-form-id="contact-form"
-//         data-header-x-api-key="your-api-key"
-//         data-header-authorization="Bearer token"></div>
-// 
-// Backend Endpoint Requirements:
-// - GET /api/forms/{formId} should return JSON with form configuration
-// - Response format should match the formConfig structure
-// - Include fields array, endpoint, method, headers, etc.`
+// 3. The form will load automatically, or call FormLoader.load('your-container-id')`
     }
 
     // Generate JavaScript field code helper

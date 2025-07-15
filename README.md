@@ -333,7 +333,7 @@ The FormBuilder now supports exporting forms as JavaScript code that can be embe
 ### Basic Usage
 
 1. **Export JavaScript Code**: Select "JavaScript (Head Script)" from the export format dropdown in FormBuilder
-2. **Configure Endpoint** (Optional): Set a form endpoint URL in the JavaScript Configuration section
+2. **Configure Endpoint** (Optional): Set a form endpoint URL in the JavaScript Configuration section to load forms dynamically
 3. **Embed in HTML**: Add the generated script to your HTML page's `<head>` section
 4. **Add Container**: Include a container element where the form should appear
 
@@ -354,7 +354,7 @@ The FormBuilder now supports exporting forms as JavaScript code that can be embe
     <div id="my-custom-form"></div>
     <script>
         // Load form into custom container
-        DynamicFormLoader.load('my-custom-form');
+        FormLoader.load('my-custom-form');
     </script>
 </body>
 </html>
